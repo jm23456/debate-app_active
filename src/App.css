@@ -5,12 +5,23 @@
   box-sizing: border-box;
 }
 
+[data-theme="light"] {
+  --bg-primary: #F6F7FB;
+  --bg-secondary: #ffffff;
+  --bg-card: #f8f7f7;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  background: #f8f8fa;
-  color: #1a1a1a;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* ROOT CONTAINER */
@@ -20,18 +31,21 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
+  position: relative;
 }
 
-/* MAIN CARD – light background */
+
+/* MAIN CARD – themed background */
 .app-card {
   width: 100%;
   max-width: 1000px;
   min-height: 100vh;
   padding: 60px 80px;
-  background: #f8f7f7;
+  background: var(--bg-card);
   border-radius: 0;
   box-shadow: none;
   border: none;
+  transition: background 0.3s ease;
 }
 
 /* TYPOGRAPHY */
@@ -231,13 +245,13 @@ body {
 }
 
 .topic-btn-active {
-  background: #f8f8ff !important;
-  box-shadow: 0 0 0 2px #7c3aed !important;
+  background: #EEF2FF !important;
+  box-shadow: 0 0 0 2px #6366F1 !important;
 }
 
 .topic-btn-active:focus {
-  border-color: #5b21b6;
-  box-shadow: 0 0 0 2px rgba(91, 33, 182, 0.15);
+  border-color: #6366F1;
+  box-shadow: 0 0 0 2px #EEF2FF;
   outline: none;
 }
 
@@ -263,19 +277,19 @@ body {
 }
 
 .primary-btn-active {
-  background: #f8f8ff !important;
-  box-shadow: 0 0 0 2px #7c3aed !important;
+  background: #EEF2FF !important;
+  box-shadow: 0 0 0 2px #6366F1!important;
 }
 
 .primary-btn-active:hover {
-  background: #f8f8ff !important;
-  box-shadow: 0 0 0 2px #6d28d9 !important;
+  background: #EEF2FF !important;
+  box-shadow: 0 0 0 2px #6366F1 !important;
   transform: none;
 }
 
 .primary-btn-active:focus {
   border-color: #5b21b6;
-  box-shadow: 0 0 0 2px rgba(91, 33, 182, 0.15);
+  box-shadow: 0 0 0 2px #EEF2FF;
   outline: none;
 }
 
@@ -342,7 +356,7 @@ body {
 }
 
 .custom-topic-row .text-input.confirmed {
-  background: #f8f8ff !important;
+  background: #ede9fe !important;
   box-shadow: 0 0 0 2px #7c3aed !important;
   border-radius: 16px;
 }
@@ -407,6 +421,25 @@ body {
   color: #991b1b;
 }
 
+/* MUTE BUTTON */
+.mute-btn {
+  border-radius: 10px;
+  padding: 4px 12px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  background: #e5e7eb;
+  width: auto;
+  margin: 0;
+  display: inline-block;
+  transition: 0.15s ease;
+}
+
+.mute-btn:hover {
+  background: #d1d5db;
+}
+
 /* TOP EXIT ROW - Timer left, Exit button right */
 .top-exit-row {
   display: flex;
@@ -469,11 +502,13 @@ body {
 .debate-arguments {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-height: 280px;
-  padding-right: 10px;
+  max-height: 350px;
+  padding: 10px;
+  scroll-behavior: smooth;
 }
 
 /* Custom scrollbar styling */
@@ -496,10 +531,11 @@ body {
 }
 
 .argument-box {
-  padding: 18px 24px;
+  padding: 14px 20px;
   border-radius: 16px;
-  min-height: 50px;
+  min-height: 60px;
   width: 90%;
+  flex-shrink: 0;
   display: flex;
   align-items: flex-start;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -507,6 +543,8 @@ body {
   margin-left: 20px;
   margin-right: 20px;
   animation: fadeInUp 0.4s ease;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 @keyframes fadeInUp {
@@ -518,6 +556,30 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Report Button für Warnungen */
+.report-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.4;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.report-btn:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.argument-box {
+  position: relative;
 }
 
 /* Sprechblasen-Pfeil für Pro (links) */
@@ -618,7 +680,7 @@ body {
 }
 
 .argument-gray {
-  background: #f3f4f6;
+  background: #e5e7eb;
   border: 2px solid #6b7280;
   border-left: 5px solid #6b7280;
 }
@@ -761,8 +823,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  gap: 10px;
+  gap: 60px;
   margin-top: 10px;
+  transform: scale(1.4);
+  transform-origin: center center;
+  padding: 20px 0;
 }
 
 .arguments-side {
@@ -777,7 +842,7 @@ body {
   border: 1px solid #d1fae5;
   align-items: flex-start;
   min-width: 450px;
-  height: 250px;
+  height: 320px;
   overflow: visible;
 }
 
@@ -806,15 +871,7 @@ body {
 
 .candidates-row {
   display: flex;
-  gap: 95px;
-  align-items: flex-end;
-  justify-content: center;
-  width: 100%;
-}
-
-.introcandidates-row {
-  display: flex;
-  gap: 100px;
+  gap: 130px;
   align-items: flex-end;
   justify-content: center;
   width: 100%;
@@ -827,14 +884,6 @@ body {
   align-items: stretch;
   gap: 10px;
   margin-top: 0px;
-}
-
-.intro-stage {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  gap: 10px;
-  margin-top: 10px;
 }
 
 .arguments-side {
@@ -878,18 +927,26 @@ body {
 
 .candidates-row {
   display: flex;
-  gap: 95px;
+  gap: 130px;
   align-items: flex-end;
   justify-content: center;
   width: 100%;
 }
 
-.introcandidates-row {
+.introcandidates-row-left {
   display: flex;
-  gap: 100px;
+  gap: 60px;
   align-items: flex-end;
-  justify-content: center;
-  width: 100%;
+  justify-content: right;
+  width: 500px;
+}
+
+.introcandidates-row-right {
+  display: flex;
+  gap: 60px;
+  align-items: flex-end;
+  justify-content: left;
+  width: 500px;
 }
 
 
@@ -900,6 +957,31 @@ body {
   align-items: center;
   gap: 10px;
   position: relative;
+  /* Slower transition when returning to normal state */
+  transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), 
+              filter 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), 
+              z-index 0s 0.4s;
+  transform-origin: bottom center;
+}
+
+/* Speaking/Focus effect - like camera focusing on speaker */
+.candidate-card.speaking {
+  transform: scale(1.15);
+  z-index: 20;
+  filter: brightness(1.05);
+  /* Faster transition when becoming the speaker */
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              filter 0.5s ease-out, 
+              z-index 0s;
+}
+
+/* Dim ALL non-speaking candidates when someone is speaking */
+.arguments-stage:has(.speaking) .candidate-card:not(.speaking),
+.intro-stage:has(.speaking) .candidate-card:not(.speaking),
+.debate-stage:has(.speaking) .candidate-card:not(.speaking),
+.active-debate-stage:has(.speaking) .candidate-card:not(.speaking) {
+  filter: brightness(0.75) saturate(0.85);
+  transform: scale(0.92);
 }
 
 .candidate-speech-bubble {
@@ -908,16 +990,40 @@ body {
   left: 50%;
   transform: translateX(-50%);
   margin-bottom: 25px;
-  width: 115px;
-  height: 120px;
+  width: 200px;
+  min-height: 80px;
+  max-height: 180px;
   border-radius: 16px;
   display: flex;
-  align-items: flex-end;
-  padding: 15px;
-  font-size: 14px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  font-size: 12px;
   font-weight: 500;
+  line-height: 1.4;
   z-index: 10;
   transition: opacity 0.4s ease, transform 0.4s ease;
+  overflow-y: auto;
+  word-wrap: break-word;
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar immer sichtbar */
+.candidate-speech-bubble::-webkit-scrollbar {
+  width: 6px;
+}
+
+.candidate-speech-bubble::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.candidate-speech-bubble::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.candidate-speech-bubble::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .candidate-speech-bubble.fade-out {
@@ -926,7 +1032,6 @@ body {
 }
 
 .candidate-speech-bubble::after {
-  content: "";
   position: absolute;
   bottom: -8px;
   left: 50%;
@@ -947,7 +1052,7 @@ body {
 }
 
 .candidate-gray .candidate-speech-bubble {
-  background: #f3f4f6;
+  background: #e5e7eb;
   border: 1px solid #e5e7eb;
 }
 
@@ -956,7 +1061,7 @@ body {
 }
 
 .candidate-green .candidate-speech-bubble {
-  background: #f0fdf4;
+  background: #dcfce7;
   border: 1px solid #dcfce7;
 }
 
@@ -965,7 +1070,7 @@ body {
 }
 
 .candidate-yellow .candidate-speech-bubble {
-  background: #fefce8;
+  background: #fef3c7;
   border: 1px solid #fef9c3;
 }
 
@@ -974,7 +1079,7 @@ body {
 }
 
 .candidate-red .candidate-speech-bubble {
-  background: #fef2f2;
+  background: #fee2e2;
   border: 1px solid #fee2e2;
 }
 
@@ -1220,11 +1325,14 @@ body {
 
 /* ========== ACTIVE DEBATE INPUT STYLES ========== */
 .active-input-footer {
-  background: linear-gradient(to top, #f3e8ff, #ffffff);
+  background: #fcf9ff;
   padding: 24px;
   border-radius: 16px;
   border: 2px solid #5b21b6;
+  /*box-shadow: 0 20px 50px rgba(91,33,182,0.25);*/
   margin-top: 20px;
+  position: relative;
+  z-index: 60;
 }
 
 .participation-prompt {
@@ -1322,7 +1430,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.275);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1340,7 +1448,7 @@ body {
 }
 
 .start-debate-modal {
-  background: rgb(243, 243, 243);
+  background: #F6F7FB;
   border-radius: 24px;
   padding: 48px 64px;
   text-align: center;
@@ -1401,4 +1509,30 @@ body {
 .start-debate-btn:active {
   transform: translateY(0);
   box-shadow: 0 4px 12px rgba(91, 33, 182, 0.4);
+}
+
+/* Urgent Prompt Overlay - Your Turn */
+.urgent-prompt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.275);
+  z-index: 50;
+  animation: fadeIn 0.3s ease;
+  pointer-events: none;
+}
+
+/* Leichteres Overlay für Urgent Prompt während Debatte */
+.urgent-prompt-overlay-light {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(196, 198, 200, 0.0);
+  z-index: 50;
+  animation: fadeIn 0.3s ease;
+  pointer-events: none;
 }

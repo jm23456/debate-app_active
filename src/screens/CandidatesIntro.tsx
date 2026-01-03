@@ -3,7 +3,6 @@ import CandidateCard from "../components/CandidateCard";
 import "../App.css";
 
 interface CandidatesIntroProps {
-  topicTitle: string;
   onNext: () => void;
   onExit: () => void;
   activeBot: number;

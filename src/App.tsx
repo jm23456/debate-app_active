@@ -4,9 +4,8 @@ import "./App.css";
 import type { Step, Role, DebateMessage } from "./types/types";
 
 import RoleSelection from "./screens/RoleSelection";
-import TopicSelection from "./screens/TopicSelection";
-import TopicIntro from "./screens/TopicIntro";
-import CandidatesIntro from "./screens/CandidatesIntro";
+import TopicIntro from "./screens/TopicIntro"
+{/*import CandidatesIntro from "./screens/CandidatesIntro";*/}
 import ArgumentsIntro from "./screens/ArgumentsIntro";
 import ActiveDebateScreen from "./screens/ActiveDebateScreen";
 import ActiveArgumentsIntro from "./screens/ActiveArgumentsIntro";
@@ -21,6 +20,7 @@ const STEPS: Record<string, Step> = {
   TOPIC_INTRO: "TOPIC_INTRO",
   CANDIDATES_INTRO: "CANDIDATES_INTRO",
   ARGUMENTS_INTRO: "ARGUMENTS_INTRO",
+  ACTIVE_ARGUMENTS_INTRO: "ACTIVE_ARGUMENTS_INTRO",
   DEBATE: "DEBATE",
   SUMMARY: "SUMMARY",
 };
@@ -98,21 +98,16 @@ const App: React.FC = () => {
           />
         )}
 
-        {step === STEPS.TOPIC && (
-          <TopicSelection
-            selectedTopic={selectedTopic}
-            setSelectedTopic={setSelectedTopic}
-            customTopic={customTopic}
-            setCustomTopic={setCustomTopic}
-            onContinue={() => setStep(STEPS.TOPIC_INTRO)}
-            onBack={() => setStep(STEPS.ROLE)}
-          />
-        )}
-
         {step === STEPS.TOPIC_INTRO && (
           <TopicIntro
             topicTitle={currentTopicTitle}
-            onNext={() => setStep(STEPS.CANDIDATES_INTRO)}
+            onNext={() => {
+              if (role === "ACTIVE") {
+                setStep(STEPS.ACTIVE_ARGUMENTS_INTRO);
+              } else {
+                setStep(STEPS.ARGUMENTS_INTRO);
+              }
+            }}
             onExit={() => {
               setStep(STEPS.SUMMARY);
               setCustomTopic("");
@@ -121,9 +116,8 @@ const App: React.FC = () => {
           />
         )}
 
-        {step === STEPS.CANDIDATES_INTRO && (
+        {/*{step === STEPS.CANDIDATES_INTRO && (
           <CandidatesIntro
-            topicTitle={currentTopicTitle}
             onNext={() => setStep(STEPS.ARGUMENTS_INTRO)}
             onExit={() => {
               setStep(STEPS.SUMMARY);
@@ -148,7 +142,7 @@ const App: React.FC = () => {
               setIntroTime(1 * 60);
               setActiveBot(0);}}
           />
-        )}
+        )}*/}
 
         {step === STEPS.ARGUMENTS_INTRO && (
           <ArgumentsIntro
@@ -167,11 +161,7 @@ const App: React.FC = () => {
             totalBots={4}
             onContinue={resetIntroTimer}
             onFinalContinue={() => {
-              if (role === "ACTIVE") {
-                setStep(STEPS.ACTIVE_ARGUMENTS_INTRO);
-              } else {
-                setStep(STEPS.DEBATE);
-              }
+              setStep(STEPS.DEBATE);
               setHasStarted(false);
             }}
             hasStarted={hasStarted}
@@ -185,6 +175,7 @@ const App: React.FC = () => {
         {step === STEPS.ACTIVE_ARGUMENTS_INTRO && (
           <ActiveArgumentsIntro
             topicTitle={currentTopicTitle}
+            introTime={formatTime(introTime)}
             onExit={() => { 
               setStep(STEPS.SUMMARY);
               setIntroTime(1 * 60);
@@ -194,13 +185,17 @@ const App: React.FC = () => {
             }}
             inputText={inputText}
             setInputText={setInputText}
-            onSend={handleSend} 
+            onSend={() => {
+              handleSend();
+              setStep(STEPS.DEBATE);
+              setHasStarted(false);
+            }}
             hasStarted={hasStarted}
             onStart={() => {
-              setStep(STEPS.DEBATE);
               setHasStarted(true);
-              setTimeLeft(15 * 60);
-              setActiveBot(0);}}
+              setIntroTime(1 * 60);
+              setActiveBot(0);
+            }}
           />
         )}
 
@@ -231,7 +226,6 @@ const App: React.FC = () => {
           <WatchDebateScreen
             topicTitle={currentTopicTitle}
             role={role}
-            messages={debateMessages}
             timeLeft={formatTime(timeLeft)}
             onExit={() => {
               setStep(STEPS.SUMMARY);

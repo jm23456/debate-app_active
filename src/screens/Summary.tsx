@@ -13,40 +13,40 @@ const Summary: React.FC<SummaryProps> = ({onStartAnother }) => {
       <section className="screen-body">
         <div className="intro-stage">
           {/* Pro Side */}
-            <div className="introcandidates-row">
+            <div className="introcandidates-row-left">
               <CandidateCardIntro color="yellow" />
               <CandidateCardIntro color="gray" />
             </div>
 
         {/* Contra Side */}
-          <div className="introcandidates-row">
+          <div className="introcandidates-row-right">
             <CandidateCardIntro color="red" />
             <CandidateCardIntro color="green" />
           </div>
         </div>
       </section>
       <header className="screen-header">
-        <p className="subtitle">Summary</p>
+        <p className="subtitle">Zusammenfassung</p>
       </header>
 
       <section className="screen-body scrollable">
         <p>
-          Thank you for participating in the debate! Here is a summary of the
-          discussion and the key arguments from both sides.
+          Die Debatte zeigt: Steigende Krankenkassenprämien entstehen durch 
+          Mengenausweitung, Fehlanreize und ungleiche Kostenverteilung.
         </p>
-        <div className="summary-section">
-          <h3>Pro Arguments</h3>
-          <p>Summary of the main pro arguments presented during the debate.</p>
-        </div>
-        <div className="summary-section">
-          <h3>Contra Arguments</h3>
-          <p>Summary of the main contra arguments presented during the debate.</p>
-        </div>
+        <p>
+          Während einige stärkere Kostensteuerung fordern, betonen andere 
+          Solidarität, Qualität und bessere Information.
+        </p>
+        <p>
+          <strong>Klar ist:</strong> Einfache Lösungen gibt es nicht – Reformen müssen 
+          Kosten, Qualität und Verantwortung gemeinsam berücksichtigen.
+        </p>
       </section>
 
       <footer className="footer-end-row">
         <button className="con-primary-btn" onClick={onStartAnother}>
-          Start another Round
+          Neue Runde starten
         </button>
       </footer>
     </div>

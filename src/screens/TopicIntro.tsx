@@ -17,21 +17,16 @@ const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) =
       </div>
       <header className="screen-header">
         <p className="subtitle">{topicTitle}</p>
-        <h2>Introduction to the topic</h2>
+        <h2>Einführung ins Thema</h2>
       </header>
       <section className="screen-body scrollable">
         <p>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-          nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-          erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
-          et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-          Lorem ipsum dolor sit amet.
+          Die Krankenkassenprämien steigen nächstes Jahr im Schnitt um 4,5 Prozent. 
+          Seit Einführung der obligatorischen Krankenversicherung sind sie deutlich 
+          stärker gestiegen als Löhne oder Teuerung. Viele Haushalte geraten unter Druck.
         </p>
         <p>
-          Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse
-          molestie consequat, vel illum dolore eu feugiat nulla facilisis at
-          vero eros et accumsan et iusto odio dignissim qui blandit praesent
-          luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+          Die Frage lautet: Wie krank ist unser Gesundheitssystem – und wo muss angesetzt werden?
         </p>
       </section>
       <footer className="footer-end-row">

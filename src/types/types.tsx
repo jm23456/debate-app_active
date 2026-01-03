@@ -4,6 +4,7 @@ export type Step =
   | "TOPIC_INTRO"
   | "CANDIDATES_INTRO"
   | "ARGUMENTS_INTRO"
+  | "ACTIVE_ARGUMENTS_INTRO"
   | "DEBATE"
   | "SUMMARY";
 

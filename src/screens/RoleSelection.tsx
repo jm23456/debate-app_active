@@ -27,7 +27,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
   const roles: { id: Role; label: string; description: string }[] = [
     {
       id: "WATCH",
-      label: "Observe the debate",
+      label: "Only observe the debate",
       description: "You observe and follow the arguments.",
     },
     {
@@ -67,18 +67,17 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
 
   return (
     <div className="screen">
-      <div className = "app-card">
 
       <section className="screen-body">
         <div className="intro-stage">
           {/* Pro Side */}
-            <div className="introcandidates-row">
+            <div className="introcandidates-row-left">
               <CandidateCardIntro color="yellow" />
               <CandidateCardIntro color="gray" />
             </div>
 
         {/* Contra Side */}
-          <div className="introcandidates-row">
+          <div className="introcandidates-row-right">
             <CandidateCardIntro color="red" />
             <CandidateCardIntro color="green" />
           </div>
@@ -112,7 +111,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
           ))}
         </div>
       </section>
-            <section className="role-title">
+      <section className="role-title">
         <h2>Choose a topic:</h2>
         <div className="button-grid-horizontal">
           {topics.map((topic) => (
@@ -169,7 +168,6 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
           Continue
         </button>
       </div>
-    </div>
     </div>
   );
 };

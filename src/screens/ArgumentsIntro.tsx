@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CandidateCard from "../components/CandidateCard";
+import MuteButton from "../components/MuteButton";
+import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
+import type { BotColor } from "../hooks/useSpeechSynthesis";
 import "../App.css";    
 
 
@@ -27,50 +30,127 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
   hasStarted,
   onStart,
 }) => {
-  const [spokenBots, setSpokenBots] = useState<number[]>([0]); // Der erste Bot hat schon gesprochen
+  const [spokenBots, setSpokenBots] = useState<number[]>([]); 
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentTypingText, setCurrentTypingText] = useState<string | undefined>(undefined);
+  const [completedTexts, setCompletedTexts] = useState<Record<number, string>>({});
+  const typingIntervalRef = useRef<number | null>(null);
+
+  // Speech Synthesis
+  const { isMuted, toggleMute, speak, stopSpeaking, getWordDuration } = useSpeechSynthesis();
+
+  // Pro: B (yellow) = Solidarität & soziale Perspektive, D (gray) = Ökonomische Systemperspektive
+  // Contra: A (red) = Kosten & Versicherer-Perspektive, C (green) = Medizinische Fachperspektive
+  const allBots = [
+    { color: "yellow", label: "Ich sehe vor allem ein Gerechtigkeitsproblem. Für viele Familien und den Mittelstand sind die Prämien kaum mehr tragbar. Gleichzeitig profitieren tiefe und sehr hohe Einkommen von Entlastungen. Die Lösung liegt nicht im Abbau von Leistungen, sondern in Solidarität, gezielter Entlastung und einer fairen Verteilung der Kosten.", description: "• Prämien sind für viele Familien kaum mehr tragbar.\n• Lösung liegt in Solidarität, gezielter Entlastung und fairer Verteilung von Kosten.\n• Nicht im Abbau von Leistungen." },
+    { color: "gray", label: "Ich möchte das System einordnen: Die Gesundheitskosten sind hoch, aber für ein reiches Land nicht aussergewöhnlich. Das Kernproblem sind Fehlanreize und fehlende Steuerung. Nicht pauschales Sparen ist gefragt, sondern gezielte Eingriffe dort, wo Überversorgung, Ineffizienz und Doppelspurigkeiten entstehen.", description: "• Keine aussergewöhnlich hohen Gesundheitskosten.\n• Es braucht kein pauschales Sparen, sondern gezielte Eingriffe bei Überversorgungen und Ineffizienzen." },
+    { color: "red", label: "Für mich ist klar: Die steigenden Prämien sind kein Zufall, sondern die direkte Folge explodierender Kosten. Diese Kosten entstehen durch immer mehr Behandlungen, unabhängig davon, ob sie nötig sind oder nicht. Solange Krankenkassen jede Leistung bezahlen müssen und keine Steuerungsmöglichkeiten haben, wird sich daran nichts ändern.", description: "• Steigende Prämien sind Folge von explodierenden Kosten durch immer mehr Behandlungen.\n• Es braucht Steuerungsmöglichkeiten für Krankenkassen.\n• Ziel: Prämien senken durch Kostenkontrolle." },
+    { color: "green", label: "Aus medizinischer Sicht ist das System widersprüchlich. Wir leisten hervorragende Medizin, aber oft zu viel davon. Es gibt unnötige Untersuchungen und Eingriffe, die weder den Patienten noch dem System nützen. Gleichzeitig fehlen Anreize für Qualität und Zurückhaltung.", description: "• Das System ist widersprüchlich: Hervorragende Medizin, aber oft zu viel davon.\n• Es gibt unnötige Untersuchungen und Eingriffe, die weder Patienten noch dem System nützen." },
+  ];
+
+  const proBots = allBots.slice(0, 2);
+  const contraBots = allBots.slice(2, 4);
+
+  const typewriterEffect = (text: string, botIndex: number, onComplete: () => void) => {
+    const words = text.split(" ");
+    let wordCount = 0;
+    setCurrentTypingText("");
+    
+    // Bot-Farbe ermitteln und Speech Synthesis mit spezifischer Stimme starten
+    const botColor = allBots[botIndex].color as BotColor;
+    speak(text, { botColor });
+    
+    // Berechne Wort-Dauer basierend auf Sprechgeschwindigkeit
+    const wordDuration = getWordDuration(text, botColor);
+    
+    typingIntervalRef.current = window.setInterval(() => {
+      wordCount++;
+      if (wordCount <= words.length) {
+        setCurrentTypingText(words.slice(0, wordCount).join(" "));
+      } else {
+        if (typingIntervalRef.current) {
+          clearInterval(typingIntervalRef.current);
+          typingIntervalRef.current = null;
+        }
+        setCurrentTypingText(undefined);
+        setCompletedTexts(prev => ({ ...prev, [botIndex]: text }));
+        setSpokenBots(prev => [...prev, botIndex]);
+        onComplete();
+      }
+    }, wordDuration);
+  };
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+      stopSpeaking();
+    };
+  }, [stopSpeaking]);
 
   const handleNext = () => {
-    // Füge den aktuellen Bot zu spokenBots hinzu
     if (!hasStarted) {
       onStart();
+      // Starte Typewriter für ersten Bot
+      setIsTyping(true);
+      setTimeout(() => {
+        setIsTyping(false);
+        typewriterEffect(allBots[0].label, 0, () => {});
+      }, 800);
       return;
     }
-    if (!spokenBots.includes(activeBot)) {
-      setSpokenBots([...spokenBots, activeBot]);
-    }
+
+    // Wenn noch am Tippen, nicht fortfahren
+    if (isTyping || currentTypingText !== undefined) return;
     
     if (activeBot < totalBots - 1) {
-      setActiveBot(activeBot + 1);   
-      onContinue();                  
+      const nextBot = activeBot + 1;
+      setActiveBot(nextBot);
+      onContinue();
+      
+      // Starte Typewriter für nächsten Bot
+      setIsTyping(true);
+      setTimeout(() => {
+        setIsTyping(false);
+        typewriterEffect(allBots[nextBot].label, nextBot, () => {});
+      }, 800);
     } else {
       onFinalContinue();
       setActiveBot(0);          
     }
   };
 
-  const proBots = [
-    { color: "yellow", label: "Pro 1" },
-    { color: "gray", label: "Pro 2" },
-  ];
+  const getBotText = (seq: number): string | undefined => {
+    if (activeBot === seq && currentTypingText !== undefined) {
+      return currentTypingText;
+    }
+    return undefined;
+  };
 
-  const contraBots = [
-    { color: "red", label: "Con 1" },
-    { color: "green", label: "Con 2" },
-  ];
-
+  const getBubbleLabel = (seq: number, _label: string): string => {
+    if (completedTexts[seq]) {
+      return completedTexts[seq];
+    }
+    return allBots[seq].description;
+  };
 
   return (
     <div className="screen">
       <div className="top-exit-row">
         <span className="timer-display">{introTime}</span>
-        <button className="exit-btn" onClick={onExit}>
-          Exit
-        </button>
+        <div className="top-buttons-row">
+          <MuteButton isMuted={isMuted} onToggle={toggleMute} />
+          <button className="exit-btn" onClick={onExit}>
+            Exit
+          </button>
+        </div>
       </div>
 
 
       <header className="screen-header">
-        <p className="subtitleArgu">Each side now gets 1 min to tell their main arguments</p>
+        <p className="subtitleArgu">Jede Seite stellt nun ihre Hauptargumente vor</p>
       </header>
 
       <section className="screen-body">
@@ -80,14 +160,17 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
             <div className="side-title">Pro</div>
             <div className="candidates-row">
               {proBots.map((bot, i) => {
-                const seq = 0 + i;
+                const seq = i;
                 return (
                   <CandidateCard
                     key={i}
                     color={bot.color as "yellow" | "gray" | "red" | "green"}
-                    hasMic={hasStarted && activeBot === seq}
+                    hasMic={hasStarted && activeBot === seq && currentTypingText !== undefined}
                     showBubble={hasStarted && (activeBot === seq || spokenBots.includes(seq))}
-                    bubbleLabel={bot.label}
+                    bubbleText={getBotText(seq)}
+                    isTyping={hasStarted && isTyping && activeBot === seq}
+                    bubbleLabel={getBubbleLabel(seq, bot.label)}
+                    isSpeaking={hasStarted && activeBot === seq && (isTyping || currentTypingText !== undefined)}
                   />
                 );
               })}
@@ -104,9 +187,12 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
                   <CandidateCard
                     key={i}
                     color={bot.color as "yellow" | "gray" | "red" | "green"}
-                    hasMic={hasStarted && activeBot === seq}
+                    hasMic={hasStarted && activeBot === seq && currentTypingText !== undefined}
                     showBubble={hasStarted && (activeBot === seq || spokenBots.includes(seq))}
-                    bubbleLabel={hasStarted ? bot.label : ""}
+                    bubbleText={getBotText(seq)}
+                    isTyping={hasStarted && isTyping && activeBot === seq}
+                    bubbleLabel={hasStarted ? getBubbleLabel(seq, bot.label) : ""}
+                    isSpeaking={hasStarted && activeBot === seq && (isTyping || currentTypingText !== undefined)}
                   />
                 );
               })}
