@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CandidateCard from "../components/CandidateCard";
 import MuteButton from "../components/MuteButton";
+import ExitWarningModal from "../components/ExitWarningModal";
 import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import type { BotColor } from "../hooks/useSpeechSynthesis";
 import type { ChatMessage } from "../types/types";
@@ -31,6 +32,7 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [showUrgentPrompt, setShowUrgentPrompt] = useState(false);
   const [hasUserSentOpinion, setHasUserSentOpinion] = useState(false);
+  const [showExitWarning, setShowExitWarning] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Speech Synthesis
@@ -77,6 +79,41 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
       stopSpeaking();
     };
   }, [stopSpeaking]);
+
+  // Skip function - überspringt nur den aktuellen Bot (stoppt Sprechen, zeigt vollen Text)
+  const handleSkip = () => {
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+    stopSpeaking();
+    
+    // Zeige den vollständigen Text des aktuellen Bots an
+    const currentBotText = allBots[activeBot].label;
+    setCurrentTypingText(undefined);
+    setCompletedTexts(prev => ({ ...prev, [activeBot]: currentBotText }));
+    setSpokenBots(prev => prev.includes(activeBot) ? prev : [...prev, activeBot]);
+    setIsTyping(false);
+  };
+
+  // Exit handlers
+  const handleExitClick = () => {
+    setShowExitWarning(true);
+  };
+
+  const handleExitConfirm = () => {
+    setShowExitWarning(false);
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+    stopSpeaking();
+    onExit();
+  };
+
+  const handleExitCancel = () => {
+    setShowExitWarning(false);
+  };
 
   const typewriterEffect = (text: string, botIndex: number, onComplete: () => void) => {
     const words = text.split(" ");
@@ -182,11 +219,21 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
 
   return (
     <div className="screen debate-screen">
+      <ExitWarningModal 
+        isOpen={showExitWarning} 
+        onConfirm={handleExitConfirm} 
+        onCancel={handleExitCancel} 
+      />
       <div className="top-exit-row">
         <span className="timer-display">{introTime}</span>
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
-          <button className="exit-btn" onClick={onExit}>
+          {hasStarted && !allBotsFinished && (isTyping || currentTypingText !== undefined) && (
+            <button className="skip-btn" onClick={handleSkip}>
+              Überspringen
+            </button>
+          )}
+          <button className="exit-btn" onClick={handleExitClick}>
             Exit
           </button>
         </div>

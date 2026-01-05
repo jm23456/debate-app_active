@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CandidateCard from "../components/CandidateCard";
 import MuteButton from "../components/MuteButton";
+import ExitWarningModal from "../components/ExitWarningModal";
 import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import type { BotColor } from "../hooks/useSpeechSynthesis";
 import type { ChatMessage } from "../types/types";
@@ -36,11 +37,70 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
   const messagesSinceUserInput = useRef(0);
   const [showUrgentPrompt, setShowUrgentPrompt] = useState(false);
   const [hasUserSentOpinion, setHasUserSentOpinion] = useState(false);
+  const [showExitWarning, setShowExitWarning] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasStartedRef = useRef(false);
+  const typingIntervalRef = useRef<number | null>(null);
+  const currentBubbleRef = useRef<{text: string, color: string, side: string} | null>(null);
 
   // Speech Synthesis
   const { isMuted, toggleMute, speak, stopSpeaking } = useSpeechSynthesis();
+
+  // Exit handlers
+  const handleExitClick = () => {
+    setShowExitWarning(true);
+  };
+
+  const handleExitConfirm = () => {
+    setShowExitWarning(false);
+    stopSpeaking();
+    onExit();
+  };
+
+  const handleExitCancel = () => {
+    setShowExitWarning(false);
+  };
+
+  // Skip function - überspringt nur den aktuellen Bot (stoppt Sprechen, zeigt vollen Text)
+  const handleSkip = () => {
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+    stopSpeaking();
+    
+    // Zeige den vollständigen Text des aktuellen Bots an
+    if (currentBubbleRef.current) {
+      const { text, color, side } = currentBubbleRef.current;
+      setCurrentTypingText(undefined);
+      setChatHistory(prev => [...prev, {
+        id: Date.now(),
+        type: "bot",
+        color: color,
+        text: text,
+        side: side,
+        isComplete: true
+      }]);
+      setVisibleBubbles(prev => prev + 1);
+      currentBubbleRef.current = null;
+      
+      // Zähle auch für den urgent prompt
+      messagesSinceUserInput.current += 1;
+      if (messagesSinceUserInput.current >= 3 && !showUrgentPrompt) {
+        setShowUrgentPrompt(true);
+      }
+    }
+  };
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+      stopSpeaking();
+    };
+  }, [stopSpeaking]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,20 +131,27 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
   const typewriterEffect = (text: string, color: string, side: string) => {
     const words = text.split(" ");
     let wordCount = 0;
+    
+    // Speichere aktuelle Bubble-Daten für Skip
+    currentBubbleRef.current = { text, color, side };
+    
     setCurrentTypingText("");
     
     // Starte Speech Synthesis mit Bot-spezifischer Stimme
     const botColor = color as BotColor;
     speak(text, { botColor });
     
-    
-    const interval = setInterval(() => {
+    typingIntervalRef.current = window.setInterval(() => {
       wordCount++;
       if (wordCount <= words.length) {
         setCurrentTypingText(words.slice(0, wordCount).join(" "));
       } else {
-        clearInterval(interval);
+        if (typingIntervalRef.current) {
+          clearInterval(typingIntervalRef.current);
+          typingIntervalRef.current = null;
+        }
         setCurrentTypingText(undefined);
+        currentBubbleRef.current = null;
         setChatHistory(prev => [...prev, {
           id: Date.now(),
           type: "bot",
@@ -196,11 +263,21 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
 
   return (
     <div className="screen active-debate-screen">
+      <ExitWarningModal 
+        isOpen={showExitWarning} 
+        onConfirm={handleExitConfirm} 
+        onCancel={handleExitCancel} 
+      />
       <div className="top-exit-row">
         <span className="timer-display">{timeLeft}</span>
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
-          <button className="exit-btn" onClick={onExit}>
+          {hasStarted && currentTypingText !== undefined && (
+            <button className="skip-btn" onClick={handleSkip}>
+              Überspringen
+            </button>
+          )}
+          <button className="exit-btn" onClick={handleExitClick}>
             Exit
           </button>
         </div>

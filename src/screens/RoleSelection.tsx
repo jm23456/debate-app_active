@@ -47,7 +47,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
     setRole(selectedRole);
   };
 
-  const topics = ["Topic 1", "Topic 2", "Topic 3"];
+  const topics = ["Topic 1", "Krankenkassenprämie", "Topic 3"];
   const [customTopicConfirmed, setCustomTopicConfirmed] = useState(false);
 
   const handleTopicSelect = (topic: string) => {
@@ -66,7 +66,14 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
   const canContinue = role && (selectedTopic || customTopicConfirmed);
 
   return (
-    <div className="screen">
+      <div className="screen" style={{
+      boxShadow: "0 20px 60px rgba(80, 60, 160, 0.15),0 8px 24px rgba(80, 60, 160, 0.10)",
+      paddingTop: "24px",
+      paddingBottom: "40px",
+      margin: "32px auto",
+      maxWidth: "1000px",
+      borderRadius: "24px"
+    }}>
 
       <section className="screen-body">
         <div className="intro-stage">
@@ -85,7 +92,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
       </section>
 
 
-      <header className="screen-header">
+      <header className="screen-header" style={{marginBottom: "30px", marginTop: "0px"}}>
         <p className="subtitle">Chatbot Debate Arena</p>
         <p className="intro-text">
           Vier KI-Persönlichkeiten. Eine Debatte.<br />
@@ -93,8 +100,19 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
         </p>
       </header>
 
-    <div className = "divider" />
+      <div className="screen" style={{
+      boxShadow: "0 2px 10px rgba(80, 60, 160, 0.2), 0 8px 24px rgba(80, 60, 160, 0.12), 0 0 80px rgba(80, 60, 160, 0.08)",
+      paddingLeft: "40px",
+      paddingRight: "40px",
+      paddingBottom: "15px",
+      paddingTop: "5px",
 
+      background: "#F9F8FD",
+      margin: "0px auto",
+      maxWidth: "860px",
+      height: "auto",
+      borderRadius: "24px"
+    }}>
       <section className="role-title">
         <h2>Select your role for the debate:</h2>
         <div className="button-grid">
@@ -159,7 +177,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
           </div>
       </section>
 
-      <div className="footer-end-row">
+      <div className="footer-end-row" style={{marginBottom: "0px"}}>
         <button 
           className="con-primary-btn" 
           onClick={onContinue}
@@ -167,6 +185,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
         >
           Continue
         </button>
+      </div>
       </div>
     </div>
   );

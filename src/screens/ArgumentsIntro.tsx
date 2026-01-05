@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import CandidateCard from "../components/CandidateCard";
 import MuteButton from "../components/MuteButton";
+import ExitWarningModal from "../components/ExitWarningModal";
 import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import type { BotColor } from "../hooks/useSpeechSynthesis";
 import "../App.css";    
@@ -35,9 +36,45 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
   const [currentTypingText, setCurrentTypingText] = useState<string | undefined>(undefined);
   const [completedTexts, setCompletedTexts] = useState<Record<number, string>>({});
   const typingIntervalRef = useRef<number | null>(null);
+  const [showExitWarning, setShowExitWarning] = useState(false);
 
   // Speech Synthesis
   const { isMuted, toggleMute, speak, stopSpeaking, getWordDuration } = useSpeechSynthesis();
+
+  // Skip function - überspringt nur den aktuellen Bot (stoppt Sprechen, zeigt vollen Text)
+  const handleSkip = () => {
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+    stopSpeaking();
+    
+    // Zeige den vollständigen Text des aktuellen Bots an
+    const currentBotText = allBots[activeBot].label;
+    setCurrentTypingText(undefined);
+    setCompletedTexts(prev => ({ ...prev, [activeBot]: currentBotText }));
+    setSpokenBots(prev => prev.includes(activeBot) ? prev : [...prev, activeBot]);
+    setIsTyping(false);
+  };
+
+  // Exit handlers
+  const handleExitClick = () => {
+    setShowExitWarning(true);
+  };
+
+  const handleExitConfirm = () => {
+    setShowExitWarning(false);
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+    stopSpeaking();
+    onExit();
+  };
+
+  const handleExitCancel = () => {
+    setShowExitWarning(false);
+  };
 
   // Pro: B (yellow) = Solidarität & soziale Perspektive, D (gray) = Ökonomische Systemperspektive
   // Contra: A (red) = Kosten & Versicherer-Perspektive, C (green) = Medizinische Fachperspektive
@@ -138,11 +175,21 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
 
   return (
     <div className="screen">
+      <ExitWarningModal 
+        isOpen={showExitWarning} 
+        onConfirm={handleExitConfirm} 
+        onCancel={handleExitCancel} 
+      />
       <div className="top-exit-row">
         <span className="timer-display">{introTime}</span>
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
-          <button className="exit-btn" onClick={onExit}>
+          {hasStarted && (isTyping || currentTypingText !== undefined) && (
+            <button className="skip-btn" onClick={handleSkip}>
+              Überspringen
+            </button>
+          )}
+          <button className="exit-btn" onClick={handleExitClick}>
             Exit
           </button>
         </div>
