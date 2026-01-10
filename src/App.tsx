@@ -12,6 +12,7 @@ import ActiveArgumentsIntro from "./screens/ActiveArgumentsIntro";
 import DebateScreen from "./screens/DebateScreen";
 import WatchDebateScreen from "./screens/WatchDebateScreen";
 import Summary from "./screens/Summary";
+import { LanguageProvider } from "./i18n/LanguageContext";
 
 
 const STEPS: Record<string, Step> = {
@@ -84,11 +85,12 @@ const App: React.FC = () => {
   const currentTopicTitle = customTopic.trim() || selectedTopic;
 
   return (
-    <div className="app-root">
-      <div className="app-card">
-        {step === STEPS.ROLE && (
-          <RoleSelection
-            role={role}
+    <LanguageProvider>
+      <div className="app-root">
+        <div className="app-card">
+          {step === STEPS.ROLE && (
+            <RoleSelection
+              role={role}
             setRole={setRole}
             selectedTopic={selectedTopic}
             setSelectedTopic={setSelectedTopic}
@@ -276,6 +278,7 @@ const App: React.FC = () => {
         )}
       </div>
     </div>
+    </LanguageProvider>
   );
 };
 

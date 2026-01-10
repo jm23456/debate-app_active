@@ -32,7 +32,11 @@ interface UseSpeechSynthesisReturn {
 }
 
 export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
-  const [isMuted, setIsMuted] = useState(false);
+  // Mute-Status aus sessionStorage laden (persistiert während der Debatte)
+  const [isMuted, setIsMuted] = useState(() => {
+    const stored = sessionStorage.getItem('debate-muted');
+    return stored === 'true';
+  });
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -91,11 +95,14 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
 
   const toggleMute = useCallback(() => {
     setIsMuted(prev => {
-      if (!prev) {
+      const newValue = !prev;
+      // Mute-Status im sessionStorage speichern
+      sessionStorage.setItem('debate-muted', String(newValue));
+      if (newValue) {
         window.speechSynthesis.cancel();
         setIsSpeaking(false);
       }
-      return !prev;
+      return newValue;
     });
   }, []);
 

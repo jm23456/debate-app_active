@@ -4,7 +4,9 @@ import MuteButton from "../components/MuteButton";
 import ExitWarningModal from "../components/ExitWarningModal";
 import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import type { BotColor } from "../hooks/useSpeechSynthesis";
-import "../App.css";    
+import "../App.css";
+import LanguageToggle from "../components/LanguageToggle";
+import { useLanguage } from '../hooks/useLanguage';    
 
 
 interface ArgumentsIntroProps {
@@ -27,6 +29,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
   hasStarted,
   onStart,
 }) => {
+  const { t } = useLanguage();
   const [spokenBots, setSpokenBots] = useState<number[]>([]); 
   const [isTyping, setIsTyping] = useState(false);
   const [currentTypingText, setCurrentTypingText] = useState<string | undefined>(undefined);
@@ -172,6 +175,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
 
   return (
     <div className="screen">
+      <LanguageToggle />
       <ExitWarningModal 
         isOpen={showExitWarning} 
         onConfirm={handleExitConfirm} 
@@ -182,14 +186,14 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
           <button className="exit-btn" onClick={handleExitClick}>
-            Exit
+            {t("exit")}
           </button>
         </div>
       </div>
 
 
       <header className="screen-header">
-        <p className="subtitleArgu">Jede Seite stellt nun ihre Hauptargumente vor</p>
+        <p className="subtitleArgu">{t("eachSide")}</p>
       </header>
 
       <section className="screen-body" style={{
@@ -258,9 +262,9 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
       {!hasStarted && (
         <div className="start-debate-modal-overlay">
           <div className="start-debate-modal">
-            <h3>In this first round the chatbots will state their main arguments</h3>
+            <h3 style={{fontSize: "18px"}}>{t("popup1")}</h3>
             <button className="start-debate-btn" onClick={handleNext}>
-              Start
+              {t("startDebate")}
             </button>
           </div>
         </div>
@@ -272,7 +276,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
           disabled={hasStarted && (isTyping || currentTypingText !== undefined)} 
           style={{marginTop: "15px"}}
         >
-          {activeBot < totalBots - 1 ? "Next Speaker" : "Continue"}
+          {activeBot < totalBots - 1 ? t("nextSpeaker") : t("continue")}
         </button>
         {hasStarted ? (
           (isTyping || currentTypingText !== undefined) ? (

@@ -6,6 +6,8 @@ import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import type { BotColor } from "../hooks/useSpeechSynthesis";
 import type { Role, DebateMessage, ChatMessage } from "../types/types";
 import "../App.css";
+import LanguageToggle from '../components/LanguageToggle';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface DebateScreenProps {
   topicTitle: string;
@@ -30,6 +32,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
   hasStarted,
   onStart,
 }) => {
+  const { t } = useLanguage();
   const [visibleBubbles, setVisibleBubbles] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<string>("yellow");
@@ -39,6 +42,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingIntervalRef = useRef<number | null>(null);
   const currentBubbleRef = useRef<{text: string, color: string, side: string} | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Speech Synthesis
   const { isMuted, toggleMute, speak, stopSpeaking, getWordDuration } = useSpeechSynthesis();
@@ -65,6 +69,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
       typingIntervalRef.current = null;
     }
     stopSpeaking();
+    setIsSpeaking(false);
     
     // Zeige den vollständigen Text des aktuellen Bots an
     if (currentBubbleRef.current) {
@@ -136,6 +141,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
     
     // Starte Speech Synthesis mit Bot-spezifischer Stimme
     const botColor = color as BotColor;
+    setIsSpeaking(true);
     speak(text, { botColor });
     
     // Berechne Wort-Dauer basierend auf Sprechgeschwindigkeit
@@ -156,6 +162,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
         // Fertig! Füge zur Chat-History hinzu und lösche Bubble-Text
         setCurrentTypingText(undefined);
         currentBubbleRef.current = null;
+        setIsSpeaking(false);
         setChatHistory(prev => [...prev, {
           id: Date.now(),
           type: "bot",
@@ -233,6 +240,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
 
   return (
     <div className="screen debate-screen">
+      <LanguageToggle />
       <ExitWarningModal 
         isOpen={showExitWarning} 
         onConfirm={handleExitConfirm} 
@@ -243,7 +251,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
           <button className="exit-btn" onClick={handleExitClick}>
-            Exit
+            {t("exit")}
           </button>
         </div>
       </div>
@@ -265,7 +273,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
             {msg.type === "bot" && (
               <button 
                 className="report-btn" 
-                title="Diese Aussage als möglicherweise falsch oder irreführend melden"
+                title={t("flag")}
                 onClick={() => alert(`Nachricht gemeldet`)}
               >
                 ⚠️
@@ -302,20 +310,20 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
             <div className="candidates-row">
               <CandidateCard 
                 color="yellow" 
-                hasMic={hasStarted && currentSpeaker === "yellow" && visibleBubbles < argumentBubbles.length}
+                hasMic={hasStarted && currentSpeaker === "yellow" && (isTyping || isSpeaking) && visibleBubbles < argumentBubbles.length}
                 isTyping={hasStarted && isTyping && currentSpeaker === "yellow"}
                 bubbleText={hasStarted && currentSpeaker === "yellow" ? currentTypingText : undefined}
-                isSpeaking={hasStarted && currentSpeaker === "yellow" && visibleBubbles < argumentBubbles.length}
+                isSpeaking={hasStarted && currentSpeaker === "yellow" && isSpeaking && visibleBubbles < argumentBubbles.length}
                 bubbleLabel="• Prämien sind für viele Familien kaum mehr tragbar.
 • Lösung liegt in Solidarität, gezielter Entlastung und fairer Verteilung von Kosten.
 • Nicht im Abbau von Leistungen."
               />
               <CandidateCard 
                 color="gray" 
-                hasMic={hasStarted && currentSpeaker === "gray" && visibleBubbles < argumentBubbles.length}
+                hasMic={hasStarted && currentSpeaker === "gray" && (isTyping || isSpeaking)&& visibleBubbles < argumentBubbles.length}
                 isTyping={hasStarted && isTyping && currentSpeaker === "gray"}
                 bubbleText={hasStarted && currentSpeaker === "gray" ? currentTypingText : undefined}
-                isSpeaking={hasStarted && currentSpeaker === "gray" && visibleBubbles < argumentBubbles.length}
+                isSpeaking={hasStarted && currentSpeaker === "gray" && isSpeaking && visibleBubbles < argumentBubbles.length}
                 bubbleLabel="• Keine aussergewöhnlich hohen Gesundheitskosten.
 • Es braucht kein pauschales Sparen, sondern gezielte Eingriffe bei Überversorgungen und Ineffizienzen."
               />
@@ -327,20 +335,20 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
             <div className="candidates-row">
               <CandidateCard 
                 color="red" 
-                hasMic={hasStarted && currentSpeaker === "red" && visibleBubbles < argumentBubbles.length}
+                hasMic={hasStarted && currentSpeaker === "red" && (isTyping || isSpeaking) && visibleBubbles < argumentBubbles.length}
                 isTyping={hasStarted && isTyping && currentSpeaker === "red"}
                 bubbleText={hasStarted && currentSpeaker === "red" ? currentTypingText : undefined}
-                isSpeaking={hasStarted && currentSpeaker === "red" && visibleBubbles < argumentBubbles.length}
+                isSpeaking={hasStarted && currentSpeaker === "red" && isSpeaking && visibleBubbles < argumentBubbles.length}
                 bubbleLabel="• Steigende Prämien sind Folge von explodierenden Kosten durch immer mehr Behandlungen.
 • Es braucht Steuerungsmöglichkeiten für Krankenkassen.
 • Ziel: Prämien senken durch Kostenkontrolle."
               />
               <CandidateCard 
                 color="green" 
-                hasMic={hasStarted && currentSpeaker === "green" && visibleBubbles < argumentBubbles.length}
+                hasMic={hasStarted && currentSpeaker === "green" && (isTyping || isSpeaking) && visibleBubbles < argumentBubbles.length}
                 isTyping={hasStarted && isTyping && currentSpeaker === "green"}
                 bubbleText={hasStarted && currentSpeaker === "green" ? currentTypingText : undefined}
-                isSpeaking={hasStarted && currentSpeaker === "green" && visibleBubbles < argumentBubbles.length}
+                isSpeaking={hasStarted && currentSpeaker === "green" && isSpeaking && visibleBubbles < argumentBubbles.length}
                 bubbleLabel="• Das System ist widersprüchlich: Hervorragende Medizin, aber oft zu viel davon.
 • Es gibt unnötige Untersuchungen und Eingriffe, die weder Patienten noch dem System nützen."
               />
@@ -354,10 +362,10 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
         <div className="start-debate-modal-overlay">
           <div className="start-debate-modal">
             <div className="modal-icon">🎙️</div>
-            <h2 className="modal-title">Ready to start the debate?</h2>
-            <p className="modal-text">The chatbots will discuss the topic. You can follow along and ask questions!</p>
+            <h2 className="modal-title">{t("ready")}</h2>
+            <p className="modal-text">{t("readyText")}</p>
             <button className="start-debate-btn" onClick={onStart}>
-              Start Debate
+              {t("startDebate")}
             </button>
           </div>
         </div>
@@ -368,7 +376,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
         <div className="custom-topic-row">
           <input
             className="text-input flex-1"
-            placeholder="Type your question/input/comment here..."
+            placeholder={t("inputPlaceholder")}
             value={inputText}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setInputText(e.target.value)
@@ -385,7 +393,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
             onClick={handleSendMessage}
             disabled={!inputText.trim()}
           >
-            Send
+            {t("send")}
           </button>
         </div>
         {hasStarted && (
@@ -395,7 +403,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
               onClick={handleContinue}
               disabled={isTyping || currentTypingText !== undefined}
             >
-              {visibleBubbles < argumentBubbles.length ? "Continue" : "Finish Debate"}
+              {visibleBubbles < argumentBubbles.length ? t("continue") : t("finishDebate")}
             </button>
             {(isTyping || currentTypingText !== undefined) ? (
               <button 

@@ -6,6 +6,8 @@ import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import type { BotColor } from "../hooks/useSpeechSynthesis";
 import type { ChatMessage } from "../types/types";
 import "../App.css";
+import LanguageToggle from "../components/LanguageToggle";
+import { useLanguage } from "../hooks/useLanguage";
 
 
 // "Be an Active Part" - Role
@@ -35,6 +37,8 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
   const [showMessageSent, setShowMessageSent] = useState(false);
   const [showExitWarning, setShowExitWarning] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
+  const [isSending, setIsSending] = useState(false);
   
   // Speech Synthesis
   const { isMuted, toggleMute, speak, stopSpeaking } = useSpeechSynthesis();
@@ -190,12 +194,16 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
   const handleSendMessage = () => {
     if (!inputText.trim()) return;
     
+    setIsSending(true);
+
     setChatHistory(prev => [...prev, {
       id: Date.now(),
       type: "user",
       text: inputText.trim(),
       isComplete: true
     }]);
+    
+    setInputText("");
     
     // Reset urgent prompt nach User-Input
     setShowUrgentPrompt(false);
@@ -212,6 +220,7 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
     setTimeout(() => {
       setShowMessageSent(false);
       onSend(); // Geht weiter zum nächsten Screen
+      setIsSending(false);
     }, 1600);
   };
 
@@ -231,6 +240,7 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
 
   return (
     <div className="screen debate-screen">
+      <LanguageToggle />
       <ExitWarningModal 
         isOpen={showExitWarning} 
         onConfirm={handleExitConfirm} 
@@ -241,13 +251,13 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
           <button className="exit-btn" onClick={handleExitClick}>
-            Exit
+            {t("exit")}
           </button>
         </div>
       </div>
 
       <header className="screen-header">
-        <p className="subtitleArgu">Jede Seite stellt nun ihre Hauptargumente vor</p>
+        <p className="subtitleArgu">{t("eachSide")}</p>
       </header>
 
       {/* Chat-History - chronologisch */}
@@ -313,16 +323,13 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
         </div>
       </section>
 
-
-      {/* Modal Overlay für Start Debate nach User-Input */}
-      {!hasStarted && hasUserSentOpinion && (
+      {!hasStarted && (
         <div className="start-debate-modal-overlay">
           <div className="start-debate-modal">
-            <div className="modal-icon">🎙️</div>
-            <h2 className="modal-title">Ready to start the debate?</h2>
-            <p className="modal-text">You've shared your opinion. Now let the debate begin!</p>
+            <p style={{fontSize: "19px"}}>{t("popup1")}</p>
+            <p style={{fontSize: "19px"}}>{t("popup2")}</p>
             <button className="start-debate-btn" onClick={handleNextSpeaker}>
-              Start Debate
+              {t("continue")}
             </button>
           </div>
         </div>
@@ -341,7 +348,7 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
             onClick={handleNextSpeaker}
             disabled={hasStarted && (isTyping || currentTypingText !== undefined)}
           >
-            {!hasStarted ? "Start" : activeBot < totalBots - 1 ? "Nächster Sprecher" : "Weiter"}
+            {!hasStarted ? t("startDebate") : activeBot < totalBots - 1 ? t("nextSpeaker") : t("continue")}
           </button>
           {hasStarted ? (
             (isTyping || currentTypingText !== undefined) ? (
@@ -362,9 +369,9 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
           {/* Aufforderung zur Teilnahme */}
           <div className={`participation-prompt ${showUrgentPrompt ? "urgent" : ""}`}>
             {showUrgentPrompt ? (
-              <span className="urgent-text">Du bist dran! Teile deine Meinung zum Thema:</span>
+              <span className="urgent-text">{t("urgentPrompt")}</span>
             ) : (
-              <span className="prompt-text">Deine Meinung ist gefragt:</span>
+              <span className="prompt-text">{t("urgentPrompt")}</span>
             )}
           </div>
           
@@ -372,24 +379,24 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
             <div className="user-mic-icon">🎙️</div>
             <input
               className="text-input active-text-input"
-              placeholder="Schreibe deine Meinung hier..."
+              placeholder={t("opinionPlaceholder")}
               value={inputText}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setInputText(e.target.value)
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                if (e.key === "Enter" && !e.shiftKey && !isSending) {
                   e.preventDefault();
                   handleSendMessage();
                 }
               }}
             />
             <button 
-              className={"send-btn active-send-btn" + (inputText.trim() ? " active" : "")}
-              onClick={handleSendMessage}
-              disabled={!inputText.trim()}
+              className={"send-btn active-send-btn" + (inputText.trim() && !isSending ? " active" : "")}
+              onClick={() => {if (!isSending) handleSendMessage()}}
+              disabled={!inputText.trim() || isSending}
             >
-              Senden
+              {t("send")}
             </button>
           </div>
           {hasStarted && (isTyping || currentTypingText !== undefined) && (

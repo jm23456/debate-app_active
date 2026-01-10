@@ -1,4 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
+import yellowVideo from "./yellow.mp4";
+import redVideo from "./red.mp4";
+import greenVideo from "./green.mp4";
+import greyVideo from "./grey.mp4";
+import yellowStandard from "./yellow_standard.jpg";
+import redStandard from "./red_standard.jpg";
+import greenStandard from "./green_standard.jpg";
+import greyStandard from "./grey_standard.jpg";
 
 interface CandidateCardProps {
   color: "yellow" | "gray" | "green" | "red";
@@ -14,7 +22,22 @@ interface CandidateCardProps {
 const CandidateCard: React.FC<CandidateCardProps> = ({ color, hasMic = false, showBubble = false, bubbleText, isTyping = false, bubbleLabel = "Introduction", isSpeaking = false }) => {
   const [hovered, setHovered] = useState(false);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const bubbleVisible = showBubble || hovered || bubbleText !== undefined || isTyping;
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  
+  // Video abspielen/stoppen wenn isSpeaking sich ändert
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    if (isSpeaking && hasMic) {
+      videoRef.current.currentTime = 0;
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
+  }, [isSpeaking, hasMic]);
   
   // Auto-scroll nach unten wenn Text sich ändert
   useEffect(() => {
@@ -22,6 +45,20 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ color, hasMic = false, sh
       bubbleRef.current.scrollTop = bubbleRef.current.scrollHeight;
     }
   }, [bubbleText]);
+
+  const getAvatarAsset = () => {
+    switch (color) {
+      case "yellow":
+        return { video: yellowVideo, image: yellowStandard };
+      case "red":
+        return { video: redVideo, image: redStandard };
+      case "green":
+        return { video: greenVideo, image: greenStandard };
+      case "gray": 
+        return { video: greyVideo, image: greyStandard };
+    }
+  }
+    const {video, image} = getAvatarAsset();
   
   return (
     <div className={`candidate-card candidate-${color}${isSpeaking ? " speaking" : ""}`}
@@ -44,7 +81,25 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ color, hasMic = false, sh
         </div>
       )}
       <div className={`candidate-robot ${hasMic ? "has-mic" : ""}`}>
-        <span className="robot-icon">🤖</span>
+          <video
+            ref={videoRef}
+            src={color === "yellow" ? yellowVideo : color === "red" ? redVideo : color === "green" ? greenVideo : greyVideo}
+            className={`robot-video ${isVideoPlaying ? "visible" : "hidden"}`}
+            loop
+            muted
+            playsInline
+            onPlay={() => setIsVideoPlaying(true)}
+            onPause={() => setIsVideoPlaying(false)}
+            onEnded={() => setIsVideoPlaying(false)}
+          />
+        
+        {!isVideoPlaying && (
+          <img src={image} 
+          alt={`${color} robot`} 
+          className="robot-image" 
+          />
+        )}
+
         {hasMic && <span className="mic-icon">🎙️</span>}
       </div>
       <div className="candidate-podium">

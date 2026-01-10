@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import type { Role } from "../types/types";
 import CandidateCardIntro from "../components/CandidateCardIntro";
 import "../App.css";
+import LanguageToggle from "../components/LanguageToggle";
+import { useLanguage } from "../hooks/useLanguage";
 
 
 interface RoleSelectionProps {
@@ -24,6 +26,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
   setCustomTopic,
   onContinue,
 }) => {
+  const { t } = useLanguage();
   const roles: { id: Role; label: string; description: string }[] = [
    /* {
       id: "WATCH",
@@ -32,12 +35,12 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
     },*/
     {
       id: "COMMENT",
-      label: "Ask questions and comment",
+      label: t("comment"),
       description: "You can send questions and short comments.",
     },
     {
       id: "ACTIVE",
-      label: "Be an active part of the debate",
+      label: t("active"),
       description: "You participate as if you were one side.",
     },
   ];
@@ -47,7 +50,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
     setRole(selectedRole);
   };
 
-  const topics = ["Topic 1", "Krankenkassenprämie", "Topic 3"];
+  const topics = [t("topic") + " 1", t("healthInsurance"), t("topic") + " 3"];
   const [customTopicConfirmed, setCustomTopicConfirmed] = useState(false);
 
   const handleTopicSelect = (topic: string) => {
@@ -76,6 +79,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
     }}>
 
       <section className="screen-body">
+        <LanguageToggle />
         <div className="intro-stage">
           {/* Pro Side */}
             <div className="introcandidates-row-left">
@@ -93,10 +97,9 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
 
 
       <header className="screen-header" style={{marginBottom: "30px", marginTop: "0px"}}>
-        <p className="subtitle">Chatbot Debate Arena</p>
+        <p className="subtitle">{t("title")}</p>
         <p className="intro-text">
-          Vier KI-Persönlichkeiten. Eine Debatte.<br />
-          Du entscheidest, wie du mitmachst.
+          {t("introText")}
         </p>
       </header>
 
@@ -114,7 +117,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
       borderRadius: "24px"
     }}>
       <section className="role-title">
-        <h2>Select your role for the debate:</h2>
+        <h2>{t("chooseRole")}</h2>
         <div className="button-grid">
           {roles.map((r) => (
             <button
@@ -130,7 +133,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
         </div>
       </section>
       <section className="role-title">
-        <h2>Choose a topic:</h2>
+        <h2>{t("chooseTopic")}</h2>
         <div className="button-grid-horizontal">
           {topics.map((topic) => (
             <button
@@ -148,12 +151,12 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
           ))}
         </div>
 
-        <h3>Or enter your own topic here:</h3>
+        <h3>{t("owntopic")}</h3>
         
         <div className="custom-topic-row">
           <input
             className={"text-input" + (customTopicConfirmed ? " confirmed" : "")}
-            placeholder="Type your own topic here..."
+            placeholder={t("topicPlaceholder")}
             value={customTopic}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setCustomTopic(e.target.value);
@@ -183,7 +186,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
           onClick={onContinue}
           disabled={!canContinue}
         >
-          Continue
+          {t("continue")}
         </button>
       </div>
       </div>

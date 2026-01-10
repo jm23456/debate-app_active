@@ -6,6 +6,8 @@ import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import type { BotColor } from "../hooks/useSpeechSynthesis";
 import type { ChatMessage } from "../types/types";
 import "../App.css";
+import LanguageToggle from "../components/LanguageToggle";
+import { useLanguage } from '../hooks/useLanguage';
 
 
 // "Be an Active Part" - Role
@@ -43,6 +45,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
   const typingIntervalRef = useRef<number | null>(null);
   const currentBubbleRef = useRef<{text: string, color: string, side: string} | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const { t } = useLanguage();
 
   // Speech Synthesis
   const { isMuted, toggleMute, speak, stopSpeaking } = useSpeechSynthesis();
@@ -102,7 +105,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
       }
       stopSpeaking();
     };
-  }, [stopSpeaking]);
+  }, [stopSpeaking, inputText]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -239,6 +242,8 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
       text: inputText.trim(),
       isComplete: true
     }]);
+
+    setInputText("");
     
     // Reset urgent prompt nach User-Input
     setShowUrgentPrompt(false);
@@ -267,6 +272,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
 
   return (
     <div className={`screen active-debate-screen ${showUrgentPrompt ? "prompt-active" : ""}`}>
+      <LanguageToggle />
       <ExitWarningModal 
         isOpen={showExitWarning} 
         onConfirm={handleExitConfirm} 
@@ -277,7 +283,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
           <button className="exit-btn" onClick={handleExitClick}>
-            Exit
+            {t("exit")}
           </button>
         </div>
       </div>
@@ -382,11 +388,11 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
       {!hasStarted && (
         <div className="start-debate-modal-overlay">
           <div className="start-debate-modal">
-            <h2 className="modal-title">Ready to start the debate?</h2>
-            <p className="modal-text" style={{marginBottom: "0px"}}>You've shared your opinion.</p>
-            <p className="modal-text" style={{marginTop: "0px"}}>Now let the chatbots respond! </p>
+            <h2 className="modal-title">{t("ready")}</h2>
+            <p className="modal-text" style={{marginBottom: "0px"}}>{t("readyText2")}</p>
+            <p className="modal-text" style={{marginTop: "0px"}}>{t("readyText3")} </p>
             <button className="start-debate-btn" onClick={handleContinue}>
-              Start Debate
+              {t("startDebate")}
             </button>
           </div>
         </div>
@@ -402,9 +408,9 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
             <button 
               className="con-primary-btn" 
               onClick={handleContinue}
-              disabled={!hasStarted && !hasUserSentOpinion}
+              disabled={hasStarted && (isTyping || currentTypingText !== undefined)}
             >
-              {!hasStarted ? "Start Debate" : visibleBubbles < argumentBubbles.length ? "Continue" : "Finish Debate"}
+              {!hasStarted ? t("startDebate") : visibleBubbles < argumentBubbles.length ? t("next") : t("continue")}
             </button>
             {hasStarted ? (
             (isTyping || currentTypingText !== undefined) ? (
@@ -427,9 +433,9 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
         {/* Aufforderung zur Teilnahme */}
         <div className={`participation-prompt ${showUrgentPrompt ? "urgent" : ""}`}>
           {showUrgentPrompt ? (
-            <span className="urgent-text">Share your thoughts on the debate:</span>
+            <span className="urgent-text">{t("urgentPrompt")}</span>
           ) : (
-            <span className="prompt-text">Tell your opinion:</span>
+            <span className="prompt-text">{t('activeInput')}</span>
           )}
         </div>
         
@@ -437,7 +443,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
           <div className="user-mic-icon">🎙️</div>
           <input
             className="text-input active-text-input"
-            placeholder="Type your opinion here..."
+            placeholder={t("opinionPlaceholder")}
             value={inputText}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setInputText(e.target.value)
@@ -454,7 +460,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
             onClick={handleSendMessage}
             disabled={!inputText.trim()}
           >
-            Send
+            {t("send")}
           </button>
         </div>
       </footer>

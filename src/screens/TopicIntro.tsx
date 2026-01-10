@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import ExitWarningModal from '../components/ExitWarningModal';
 import "../App.css";
+import LanguageToggle from '../components/LanguageToggle';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface TopicIntroProps {
   topicTitle: string;
@@ -9,6 +11,7 @@ interface TopicIntroProps {
 }
 
 const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) => {
+  const { t } = useLanguage();
   const [showExitWarning, setShowExitWarning] = useState(false);
 
   const handleExitClick = () => {
@@ -25,6 +28,8 @@ const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) =
   };
 
   return (
+    <section className="screen-body">
+      <LanguageToggle />
     <div className="screen-wrapper">
       <ExitWarningModal 
         isOpen={showExitWarning} 
@@ -33,7 +38,7 @@ const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) =
       />
       <div className="exit-btn-outside">
         <button className="exit-btn" onClick={handleExitClick}>
-          Exit
+          {t("exit")}
         </button>
       </div>
       <div className="screen" style={{
@@ -44,9 +49,9 @@ const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) =
         borderRadius: "24px"
       }}>
         <header className="screen-header" style={{marginBottom: "30px"}}>
-          <h4 style={{ fontSize: "28px", textAlign: "center", marginBottom: "5px" }}>Einführung ins Thema:</h4>
+          <h4 style={{ fontSize: "28px", textAlign: "center", marginBottom: "5px" }}>{t("topicIntro")}</h4>
           <p className="subtitle" style={{ marginTop: "10px"}}>{topicTitle}</p>
-          <h2 style={{ textAlign: "center", marginTop: "30px" }}>Warum die Kosten steigen - und was das für uns bedeutet</h2>
+          <h2 style={{ textAlign: "center", marginTop: "30px" }}>{t("topicIntroH")}</h2>
         </header>
         <section className="screen-body scrollable">
           <div className="topic-intro-content">
@@ -55,23 +60,23 @@ const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) =
             </div>
             <div className="topic-intro-text">
               <p>
-                Die Krankenkassenprämien steigen nächstes Jahr im Schnitt um 4,5 Prozent.
+                {t("topicIntroText1")}
               </p>
               <p> 
-                Seit Einführung der obligatorischen Kranken- versicherung sind sie deutlich 
-                stärker gestiegen als Löhne oder Teuerung. Viele Haushalte geraten unter Druck.
+                {t("topicIntroText2")}
               </p>
               <p style={{ marginBottom: "35px" }}>
-                Die Frage lautet: Wie krank ist unser Gesundheitssystem – und wo muss angesetzt werden?
+                {t("topicIntroText3")}
               </p>
               <button className="con-primary-btn" onClick={onNext}>
-                Next
+                {t("next")}
               </button>
             </div>
           </div>
         </section>
       </div>
     </div>
+    </section>
   );
 };
 
