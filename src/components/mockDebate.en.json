@@ -1,0 +1,113 @@
+{
+  "debate_id": "arena_healthcare_premiums_opening_then_dialogue",
+  "language": "en",
+  "source": "Arena SRF 07.10.2016 – Health Insurance Premium Shock",
+  "roles": {
+    "SYSTEM": {
+      "label": "System",
+      "description": "Neutral introduction and closing without moderation"
+    },
+    "A": {
+      "label": "Costs & Insurers' Perspective",
+      "orientation": "cost-focused, regulation-oriented",
+      "description": "- Rising premiums are the result of exploding costs caused by an increasing number of medical treatments.\n- Health insurers need stronger steering mechanisms.\n- Goal: reduce premiums through cost control."
+    },
+    "B": {
+      "label": "Solidarity & Social Perspective",
+      "orientation": "left/green, social policy",
+      "description": "- Premiums are becoming unaffordable for many families.\n- Solutions lie in solidarity, targeted relief, and fair cost distribution – not in cutting benefits."
+    },
+    "C": {
+      "label": "Medical Professional Perspective",
+      "orientation": "clinical, hospital-based",
+      "description": "- The system is contradictory: excellent medicine, but often too much of it.\n- There are unnecessary tests and procedures that benefit neither patients nor the system."
+    },
+    "D": {
+      "label": "Economic System Perspective",
+      "orientation": "health economics",
+      "description": "- Healthcare costs are not exceptionally high for a wealthy country.\n- Instead of across-the-board cuts, targeted interventions are needed where inefficiencies arise."
+    },
+    "E": {
+      "label": "Affected Population",
+      "side": "UNDECIDED",
+      "description": "- Financial burden. Health insurance premiums have been rising faster than wages for years.\n- Expectations for efficiency and transparency in the system."
+    }
+  },
+
+  "Topic Introduction": [
+    {
+      "id": 1,
+      "speaker": "SYSTEM",
+      "text": "Health insurance premiums are expected to rise by an average of 4.5 percent next year. Since the introduction of mandatory health insurance, premiums have increased much faster than wages or inflation. Many households are under pressure. The key question is: how unhealthy is our healthcare system – and where should reforms begin?"
+    }
+  ],
+
+  "Arguments Intro": [
+    {
+      "id": 1,
+      "speaker": "A",
+      "text": "For me, it is clear: rising health insurance premiums are not a coincidence but the direct result of exploding costs. These costs are driven by an ever-increasing number of treatments, whether necessary or not. As long as insurers are forced to pay for every service, nothing will change. If we want to reduce premiums, we must tackle costs."
+    },
+    {
+      "id": 2,
+      "speaker": "B",
+      "text": "I primarily see a fairness problem. For many middle-class households, premiums are becoming an increasing burden, while very high incomes feel the impact far less. This creates the impression that costs are unfairly distributed. In my view, unequal cost sharing is the core issue."
+    },
+    {
+      "id": 3,
+      "speaker": "C",
+      "text": "From a medical perspective, the system is contradictory. We provide excellent healthcare, but often too much of it. There are unnecessary tests that benefit neither patients nor the system. What is missing are incentives for quality and restraint."
+    },
+    {
+      "id": 4,
+      "speaker": "D",
+      "text": "From an economic point of view, the healthcare system is not out of control. For a wealthy country, healthcare spending is not unusual. The real problems lie in misaligned incentives and inefficient structures. What we need are targeted interventions, not blanket cuts."
+    },
+    {
+      "id": 5,
+      "speaker": "E",
+      "text": "Premiums have been rising faster than wages for years, and for many households this is becoming a serious burden. I pay my premiums every month and feel like they keep increasing without receiving better services. I don’t want less healthcare, but I do want transparency and accountability."
+    }
+  ],
+
+  "debate_script": [
+    {
+      "id": 1,
+      "speaker": "A",
+      "text": "Premiums are the consequence of costs, and costs are the result of treatments. The more treatments are provided – necessary or not – the higher costs rise, and with them, premiums."
+    },
+    {
+      "id": 2,
+      "speaker": "B",
+      "text": "This situation is no longer sustainable. For many people, the burden of premiums is becoming unbearable. At the same time, premiums have increased faster than actual healthcare costs."
+    },
+    {
+      "id": 3,
+      "speaker": "D",
+      "text": "Economically speaking, the system is not out of control. Healthcare spending has remained stable at around ten percent of GDP, comparable to similar countries."
+    },
+    {
+      "id": 4,
+      "speaker": "A",
+      "text": "Nevertheless, action is required. If around 20 percent of services are unnecessary or inefficient, we are talking about savings of six to eight billion Swiss francs."
+    },
+    {
+      "id": 5,
+      "speaker": "C",
+      "text": "That is true. There are surgeries that are not necessary, and patients who consult doctor after doctor until someone performs the procedure."
+    },
+    {
+      "id": 6,
+      "speaker": "B",
+      "text": "Cutting the basic benefits catalogue cannot be the solution. That would lead to a two-tier healthcare system. Instead, necessary treatments must be used more selectively and responsibly."
+    }
+  ],
+
+  "summary": [
+    {
+      "id": 1,
+      "speaker": "SYSTEM",
+      "text": "The debate shows that rising health insurance premiums are driven by increasing volumes of care, misaligned incentives, and unequal cost distribution. While some argue for stronger cost control, others emphasize solidarity, quality, and transparency. There are no simple solutions – reforms must address costs, quality, and responsibility together."
+    }
+  ]
+}

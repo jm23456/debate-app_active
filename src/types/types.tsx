@@ -23,4 +23,5 @@ export interface ChatMessage {
   text: string;
   side?: string;
   isComplete?: boolean;
+  isIntro?: boolean;
 }

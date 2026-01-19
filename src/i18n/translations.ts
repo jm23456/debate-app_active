@@ -47,7 +47,9 @@ de: {
     flag: "Diese Aussage als möglicherweise falsch oder irreführend melden",
     urgentPrompt: "Du bist dran! Teile deine Meinung zum Thema:",
     activeInput: "Teile deine Meinung mit:",
-    shareOpinion: "Teile deine Gedanken zur Debatte:"
+    shareOpinion: "Teile deine Gedanken zur Debatte:",
+    timeExpiredContinue: "Die Zeit ist abgelaufen. Bitte fahre fort.",
+    timeExpiredFinish: "Die Zeit ist abgelaufen. Bitte beende nun die Debatte."
 },
 en: {
     continue: "Continue",
@@ -97,7 +99,9 @@ en: {
     flag: "Report this statement as potentially false or misleading",
     urgentPrompt: "It's your turn! Share your opinion on the topic:",
     activeInput: "Tell your opinion:",
-    shareOpinion: "Share your thoughts on the debate:"
+    shareOpinion: "Share your thoughts on the debate:",
+    timeExpiredContinue: "Time is up. Please continue.",
+    timeExpiredFinish: "Time is up. Please finish the debate now."
 },
 } as const;
 

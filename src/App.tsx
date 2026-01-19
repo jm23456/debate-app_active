@@ -38,6 +38,7 @@ const App: React.FC = () => {
     { id: 4, side: "Pro", text: "Introduction" },
   ]);
   const [inputText, setInputText] = useState<string>("");
+  const [userIntroMessage, setUserIntroMessage] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(15 * 60); // 15:00
   const [introTime, setIntroTime] = useState<number>(1 * 60); // 1:00
   const resetIntroTimer = () => setIntroTime(1 * 60); // Reset auf 1 Minute
@@ -159,7 +160,7 @@ const App: React.FC = () => {
             introTime={formatTime(introTime)}
             activeBot={activeBot}
             setActiveBot={setActiveBot}
-            totalBots={4}
+            totalBots={5}
             onContinue={resetIntroTimer}
             onFinalContinue={() => {
               setStep(STEPS.DEBATE);
@@ -187,6 +188,7 @@ const App: React.FC = () => {
             inputText={inputText}
             setInputText={setInputText}
             onSend={() => {
+              setUserIntroMessage(inputText.trim());
               handleSend();
               setStep(STEPS.DEBATE);
               setHasStarted(false);
@@ -213,6 +215,7 @@ const App: React.FC = () => {
               setIntroTime(1 * 60);
               setCustomTopic("");
               setSelectedTopic("");
+              setUserIntroMessage(null);
             }}
             hasStarted={hasStarted}
             onStart={() => {
@@ -220,6 +223,7 @@ const App: React.FC = () => {
               setTimeLeft(15 * 60);
               setActiveBot(0);
             }}
+            userIntroMessage={userIntroMessage}
           />
         )}
 

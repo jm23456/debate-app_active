@@ -249,6 +249,11 @@ body {
   background: #f3f4f6;
 }
 
+.topic-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .topic-btn-active {
   background: #EEF2FF !important;
   box-shadow: 0 0 0 2px #6366F1 !important;
@@ -352,6 +357,12 @@ body {
   width: 100%;
   padding-right: 80px;
   height: 46px;
+}
+
+.custom-topic-row .text-input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .custom-topic-row .text-input:focus {
@@ -546,6 +557,45 @@ body {
   line-height: 1.5;
 }
 
+/* Intro-Nachrichten: kleiner und mit Label */
+.argument-box.argument-intro {
+  padding: 8px 14px;
+  min-height: 40px;
+  font-size: 11px;
+  opacity: 0.85;
+  width: 85%;
+}
+
+/* Intro-Bubbles Ausrichtung: Yellow/Red links, Gray/Blue/Green rechts */
+.argument-intro.argument-yellow,
+.argument-intro.argument-red {
+  align-self: flex-start !important;
+  margin-right: auto !important;
+  margin-left: 20px !important;
+}
+
+.argument-intro.argument-gray,
+.argument-intro.argument-blue,
+.argument-intro.argument-green {
+  align-self: flex-end !important;
+  margin-left: auto !important;
+  margin-right: 20px !important;
+}
+
+.intro-label {
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background: #6b7280;
+  color: white;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -581,9 +631,9 @@ body {
   position: relative;
 }
 
-/* Sprechblasen-Pfeil für Pro (links) */
+/* Sprechblasen-Pfeil für links (yellow, red) */
 .argument-yellow::before,
-.argument-gray::before {
+.argument-red::before {
   content: "";
   position: absolute;
   left: -10px;
@@ -594,22 +644,19 @@ body {
   border-color: transparent;
 }
 
-.argument-blue::before {
-  border-right-color: #3b82f6;
-}
-
 .argument-yellow::before {
   border-right-color: #f59e0b;
 }
 
-.argument-gray::before {
-  border-right-color: #6b7280;
+.argument-red::before {
+  border-right-color: #ef4444;
 }
 
 
-/* Sprechblasen-Pfeil für Contra (rechts) */
-.argument-green::before,
-.argument-red::before {
+/* Sprechblasen-Pfeil für rechts (gray, blue, green) */
+.argument-gray::before,
+.argument-blue::before,
+.argument-green::before {
   content: "";
   position: absolute;
   right: -10px;
@@ -620,26 +667,30 @@ body {
   border-color: transparent;
 }
 
+.argument-gray::before {
+  border-left-color: #6b7280;
+}
+
+.argument-blue::before {
+  border-left-color: #3b82f6;
+}
+
 .argument-green::before {
   border-left-color: #10b981;
 }
 
-.argument-red::before {
-  border-left-color: #ef4444;
-}
-
-/* Pro Bubbles links ausrichten */
-.argument-blue,
-.argument-gray,
-.argument-yellow {
+/* Bubbles links ausrichten (Yellow, Red) */
+.argument-yellow,
+.argument-red {
   align-self: flex-start;
   margin-right: auto;
   max-width: 95%;
 }
 
-/* Contra Bubbles rechts ausrichten */
-.argument-green,
-.argument-red {
+/* Bubbles rechts ausrichten (Gray, Blue, Green) */
+.argument-gray,
+.argument-blue,
+.argument-green {
   align-self: flex-end;
   margin-left: auto;
   max-width: 95%;
@@ -649,7 +700,6 @@ body {
 .argument-user {
   align-self: center;
   max-width: 100%;
-  width: 95%;
 }
 
 .argument-pro {
@@ -668,7 +718,21 @@ body {
 
 .argument-user {
   background: #dbeafe;
-  border: 1px solid #bfdbfe;
+  border: 3px solid #bfdbfe;
+}
+
+/* User-Intro: gleiche Schriftstärke wie Bot-Nachrichten */
+.argument-user.argument-intro {
+  font-weight: 600;
+}
+
+.argument-user.argument-intro .argument-text {
+  font-weight: 600;
+}
+
+/* Intro-Label für User-Nachrichten */
+.argument-user.argument-intro .intro-label {
+  background: #3b82f6;
 }
 
 /* Argument Bubbles mit Chatbot-Farben */
@@ -709,9 +773,16 @@ body {
   line-height: 1.5;
 }
 
+/* Intro-Nachrichten: kleinere Schrift */
+.argument-intro .argument-label,
+.argument-intro .argument-text {
+  font-size: 12px;
+}
+
 .argument-text {
-  font-size: 14px;
+  font-size: 16px;
   color: #1a1a1a;
+  line-height: 1.5;
 }
 
 /* Typing Indicator Animation */
@@ -861,47 +932,19 @@ body {
   width: 100%;
 }
 
-/* ARGUMENTS STAGE - Pro vs Contra layout */
+/* ARGUMENTS STAGE - Unified layout */
 .arguments-stage {
   display: flex;
   justify-content: center;
-  align-items: stretch;
+  align-items: flex-end;
   height: 500px;
-  gap: 10px;
+  gap: 130px;
   margin-top: 0px;
-}
-
-.arguments-side {
-  display: flex;
-  flex-direction: column;
   padding: 20px;
-  border-radius: 16px;
 }
 
-.pro-side {
-  /*background: #ecfdf5;
-  border: 1px solid #d1fae5; */
-  align-items: flex-end;
-  min-width: 450px;
-  justify-content: space-between;
-  overflow: visible;
-}
-
-.pro-side .candidates-row {
-  margin-top: auto;
-}
-
-.contra-side {
-  /*background: #eff6ff;
-  border: 1px solid #dbeafe;*/
-  align-items: flex-end;
-  min-width: 450px;
-  justify-content: space-between;
-  overflow: visible;
-}
-
-.contra-side .candidates-row {
-  margin-top: auto;
+.bubble-label{
+  white-space: pre-line;
 }
 
 .side-title {
@@ -918,12 +961,27 @@ body {
   width: 100%;
 }
 
+.candidates-row-unified {
+  display: flex;
+  gap: 100px;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  padding: 20px 0;
+}
+
 .introcandidates-row-left {
   display: flex;
   gap: 60px;
   align-items: flex-end;
   justify-content: right;
   width: 500px;
+}
+
+.introcandidates-row-center {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
 .introcandidates-row-right {
@@ -969,24 +1027,34 @@ body {
   transform: scale(0.92);
 }
 
+/* Breitere Speech Bubbles beim Sprechen - nur in Debate Screens */
+.debate-stage .candidate-card.speaking .candidate-speech-bubble,
+.active-debate-stage .candidate-card.speaking .candidate-speech-bubble {
+  width: 300px;
+  max-height: 320px;
+  transition: width 0.4s ease, max-height 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
+}
+
 .candidate-speech-bubble {
   position: absolute;
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   margin-bottom: 25px;
-  width: 200px;
+  width: 165px;
   min-height: 80px;
   max-height: 220px;
   border-radius: 16px;
   display: flex;
   align-items: flex-start;
-  padding: 12px 14px;
+  padding: 10px 6px;
+  padding-right: 0px;
+  padding-left: 8px;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
   z-index: 10;
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: width 0.4s ease, max-height 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
   overflow-y: auto;
   word-wrap: break-word;
   scroll-behavior: smooth;

@@ -5,6 +5,7 @@ import ExitWarningModal from "../components/ExitWarningModal";
 import useSpeechSynthesis from "../hooks/useSpeechSynthesis";
 import type { BotColor } from "../hooks/useSpeechSynthesis";
 import type { Role, ChatMessage } from "../types/types";
+import { useLanguage } from '../hooks/useLanguage';
 import "../App.css";
 
 interface WatchDebateScreenProps {
@@ -22,6 +23,7 @@ const WatchDebateScreen: React.FC<WatchDebateScreenProps> = ({
   hasStarted,
   onStart,
 }) => {
+  const { language } = useLanguage();
   const [visibleBubbles, setVisibleBubbles] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<string>("yellow");
@@ -128,7 +130,7 @@ const WatchDebateScreen: React.FC<WatchDebateScreenProps> = ({
     
     // Starte Speech Synthesis mit Bot-spezifischer Stimme
     const botColor = color as BotColor;
-    speak(text, { botColor });
+    speak(text, { botColor, lang: language });
     
     // Berechne Wort-Dauer basierend auf Sprechgeschwindigkeit
     const wordDuration = getWordDuration(text, botColor);
@@ -259,55 +261,54 @@ const WatchDebateScreen: React.FC<WatchDebateScreenProps> = ({
       {/* Pro vs Contra stage */}
       <section className="debate-stage">
         <div className="arguments-stage">
-          {/* Pro Side */}
-          <div className="arguments-side pro-side">
-            <div className="candidates-row">
-              <CandidateCard 
-                color="yellow" 
-                hasMic={hasStarted && currentSpeaker === "yellow" && visibleBubbles < argumentBubbles.length}
-                isTyping={hasStarted && isTyping && currentSpeaker === "yellow"}
-                bubbleText={hasStarted && currentSpeaker === "yellow" ? currentTypingText : undefined}
-                isSpeaking={hasStarted && currentSpeaker === "yellow" && visibleBubbles < argumentBubbles.length}
-                bubbleLabel="• Prämien sind für viele Familien kaum mehr tragbar.
+          <CandidateCard 
+            color="yellow" 
+            hasMic={hasStarted && currentSpeaker === "yellow" && visibleBubbles < argumentBubbles.length}
+            isTyping={hasStarted && isTyping && currentSpeaker === "yellow"}
+            bubbleText={hasStarted && currentSpeaker === "yellow" ? currentTypingText : undefined}
+            isSpeaking={hasStarted && currentSpeaker === "yellow" && visibleBubbles < argumentBubbles.length}
+            bubbleLabel="• Prämien sind für viele Familien kaum mehr tragbar.
 • Lösung liegt in Solidarität, gezielter Entlastung und fairer Verteilung von Kosten.
 • Nicht im Abbau von Leistungen."
-              />
-              <CandidateCard 
-                color="gray" 
-                hasMic={hasStarted && currentSpeaker === "gray" && visibleBubbles < argumentBubbles.length}
-                isTyping={hasStarted && isTyping && currentSpeaker === "gray"}
-                bubbleText={hasStarted && currentSpeaker === "gray" ? currentTypingText : undefined}
-                isSpeaking={hasStarted && currentSpeaker === "gray" && visibleBubbles < argumentBubbles.length}
-                bubbleLabel="• Keine aussergewöhnlich hohen Gesundheitskosten.
+          />
+          <CandidateCard 
+            color="gray" 
+            hasMic={hasStarted && currentSpeaker === "gray" && visibleBubbles < argumentBubbles.length}
+            isTyping={hasStarted && isTyping && currentSpeaker === "gray"}
+            bubbleText={hasStarted && currentSpeaker === "gray" ? currentTypingText : undefined}
+            isSpeaking={hasStarted && currentSpeaker === "gray" && visibleBubbles < argumentBubbles.length}
+            bubbleLabel="• Keine aussergewöhnlich hohen Gesundheitskosten.
 • Es braucht kein pauschales Sparen, sondern gezielte Eingriffe bei Überversorgungen und Ineffizienzen."
-              />
-            </div>
-          </div>
-
-          {/* Contra Side */}
-          <div className="arguments-side contra-side">
-            <div className="candidates-row">
-              <CandidateCard 
-                color="red" 
-                hasMic={hasStarted && currentSpeaker === "red" && visibleBubbles < argumentBubbles.length}
-                isTyping={hasStarted && isTyping && currentSpeaker === "red"}
-                bubbleText={hasStarted && currentSpeaker === "red" ? currentTypingText : undefined}
-                isSpeaking={hasStarted && currentSpeaker === "red" && visibleBubbles < argumentBubbles.length}
-                bubbleLabel="• Steigende Prämien sind Folge von explodierenden Kosten durch immer mehr Behandlungen.
+          />
+          <CandidateCard 
+            color="blue" 
+            hasMic={hasStarted && currentSpeaker === "blue" && visibleBubbles < argumentBubbles.length}
+            isTyping={hasStarted && isTyping && currentSpeaker === "blue"}
+            bubbleText={hasStarted && currentSpeaker === "blue" ? currentTypingText : undefined}
+            isSpeaking={hasStarted && currentSpeaker === "blue" && visibleBubbles < argumentBubbles.length}
+            bubbleLabel="• Prämien steigen stärker als Löhne.
+• Gefühl von Ineffizienz und unklarer Verantwortung.
+• Erwartung: Nachvollziehbarer Umgang mit Beiträgen."
+          />
+          <CandidateCard 
+            color="red" 
+            hasMic={hasStarted && currentSpeaker === "red" && visibleBubbles < argumentBubbles.length}
+            isTyping={hasStarted && isTyping && currentSpeaker === "red"}
+            bubbleText={hasStarted && currentSpeaker === "red" ? currentTypingText : undefined}
+            isSpeaking={hasStarted && currentSpeaker === "red" && visibleBubbles < argumentBubbles.length}
+            bubbleLabel="• Steigende Prämien sind Folge von explodierenden Kosten durch immer mehr Behandlungen.
 • Es braucht Steuerungsmöglichkeiten für Krankenkassen.
 • Ziel: Prämien senken durch Kostenkontrolle."
-              />
-              <CandidateCard 
-                color="green" 
-                hasMic={hasStarted && currentSpeaker === "green" && visibleBubbles < argumentBubbles.length}
-                isTyping={hasStarted && isTyping && currentSpeaker === "green"}
-                bubbleText={hasStarted && currentSpeaker === "green" ? currentTypingText : undefined}
-                isSpeaking={hasStarted && currentSpeaker === "green" && visibleBubbles < argumentBubbles.length}
-                bubbleLabel="• Das System ist widersprüchlich: Hervorragende Medizin, aber oft zu viel davon.
+          />
+          <CandidateCard 
+            color="green" 
+            hasMic={hasStarted && currentSpeaker === "green" && visibleBubbles < argumentBubbles.length}
+            isTyping={hasStarted && isTyping && currentSpeaker === "green"}
+            bubbleText={hasStarted && currentSpeaker === "green" ? currentTypingText : undefined}
+            isSpeaking={hasStarted && currentSpeaker === "green" && visibleBubbles < argumentBubbles.length}
+            bubbleLabel="• Das System ist widersprüchlich: Hervorragende Medizin, aber oft zu viel davon.
 • Es gibt unnötige Untersuchungen und Eingriffe, die weder Patienten noch dem System nützen."
-              />
-            </div>
-          </div>
+          />
         </div>
       </section>
    

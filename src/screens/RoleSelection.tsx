@@ -49,8 +49,9 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
   const handleRoleSelect = (selectedRole: Role) => {
     setRole(selectedRole);
   };
+  const HEALTH_INSURANCE_TOPIC = t("healthInsurance");
 
-  const topics = [t("topic") + " 1", t("healthInsurance"), t("topic") + " 3"];
+  const topics = [t("topic") + " 1", HEALTH_INSURANCE_TOPIC, t("topic") + " 3"];
   const [customTopicConfirmed, setCustomTopicConfirmed] = useState(false);
 
   const handleTopicSelect = (topic: string) => {
@@ -86,6 +87,10 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
               <CandidateCardIntro color="yellow" />
               <CandidateCardIntro color="gray" />
             </div>
+
+          <div className="introcandidates-row-center">
+            <CandidateCardIntro color="blue" />
+          </div>
 
         {/* Contra Side */}
           <div className="introcandidates-row-right">
@@ -135,20 +140,25 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
       <section className="role-title">
         <h2>{t("chooseTopic")}</h2>
         <div className="button-grid-horizontal">
-          {topics.map((topic) => (
-            <button
-              key={topic}
-              className={
-                "topic-btn outline" +
-                (selectedTopic === topic && !customTopic
+          {topics.map((topic) => {
+            const isHealthTopic = topic === HEALTH_INSURANCE_TOPIC;
+            return (
+              <button
+                key={topic}
+                className={
+                  "topic-btn outline" +
+                  (selectedTopic === topic && !customTopic
                   ? " topic-btn-active"
                   : "")
               }
-              onClick={() => handleTopicSelect(topic)}
+              onClick={() => {if (isHealthTopic) {
+                handleTopicSelect(topic);}
+              }}
+              disabled={!isHealthTopic}
             >
               {topic}
             </button>
-          ))}
+          );})}
         </div>
 
         <h3>{t("owntopic")}</h3>
@@ -158,6 +168,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
             className={"text-input" + (customTopicConfirmed ? " confirmed" : "")}
             placeholder={t("topicPlaceholder")}
             value={customTopic}
+            disabled 
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setCustomTopic(e.target.value);
                   setCustomTopicConfirmed(false);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import CandidateCard from "../components/CandidateCard";
 import MuteButton from "../components/MuteButton";
 import ExitWarningModal from "../components/ExitWarningModal";
@@ -7,6 +7,8 @@ import type { BotColor } from "../hooks/useSpeechSynthesis";
 import "../App.css";
 import LanguageToggle from "../components/LanguageToggle";
 import { useLanguage } from '../hooks/useLanguage';    
+import mockDebateDE from '../components/mockDebate.de.json';
+import mockDebateEN from '../components/mockDebate.en.json';
 
 
 interface ArgumentsIntroProps {
@@ -29,7 +31,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
   hasStarted,
   onStart,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [spokenBots, setSpokenBots] = useState<number[]>([]); 
   const [isTyping, setIsTyping] = useState(false);
   const [currentTypingText, setCurrentTypingText] = useState<string | undefined>(undefined);
@@ -37,6 +39,38 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
   const typingIntervalRef = useRef<number | null>(null);
   const [showExitWarning, setShowExitWarning] = useState(false);
   const [activeBot, setActiveBot] = useState(0);
+  const [showTimeExpired, setShowTimeExpired] = useState(false);
+  type Color = "yellow" | "gray" | "blue" | "green" | "red" ;
+  type Bot = {
+    color: Color;
+    label: string;
+    description: string;
+  };
+
+  type Speaker = "A" | "B" | "C" | "D" | "E" | "SYSTEM";
+
+    type DebateScriptItem = {
+    id: number;
+    speaker: Speaker;
+    text: string;
+  }
+
+  type RoleData = {
+    description: string;
+  }
+
+  type DebateData = {
+    debate_script?: DebateScriptItem[];
+    "Arguments Intro"?: DebateScriptItem[];
+    roles?: Record<string, RoleData>;
+  }
+
+  // Timer abgelaufen Check
+  useEffect(() => {
+    if (introTime === "0:00" && hasStarted && !showTimeExpired) {
+      setShowTimeExpired(true);
+    }
+  }, [introTime, hasStarted, showTimeExpired]);
 
   // Speech Synthesis
   const { isMuted, toggleMute, speak, stopSpeaking, getWordDuration } = useSpeechSynthesis();
@@ -78,15 +112,33 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
 
   // Pro: B (yellow) = Solidarität & soziale Perspektive, D (gray) = Ökonomische Systemperspektive
   // Contra: A (red) = Kosten & Versicherer-Perspektive, C (green) = Medizinische Fachperspektive
-  const allBots = [
-    { color: "yellow", label: "Ich sehe vor allem ein Gerechtigkeitsproblem. Für viele Familien und den Mittelstand sind die Prämien kaum mehr tragbar. Gleichzeitig profitieren tiefe und sehr hohe Einkommen von Entlastungen. Die Lösung liegt nicht im Abbau von Leistungen, sondern in Solidarität, gezielter Entlastung und einer fairen Verteilung der Kosten.", description: "• Prämien sind für viele Familien kaum mehr tragbar.\n• Lösung liegt in Solidarität, gezielter Entlastung und fairer Verteilung von Kosten.\n• Nicht im Abbau von Leistungen." },
-    { color: "gray", label: "Ich möchte das System einordnen: Die Gesundheitskosten sind hoch, aber für ein reiches Land nicht aussergewöhnlich. Das Kernproblem sind Fehlanreize und fehlende Steuerung. Nicht pauschales Sparen ist gefragt, sondern gezielte Eingriffe dort, wo Überversorgung, Ineffizienz und Doppelspurigkeiten entstehen.", description: "• Keine aussergewöhnlich hohen Gesundheitskosten.\n• Es braucht kein pauschales Sparen, sondern gezielte Eingriffe bei Überversorgungen und Ineffizienzen." },
-    { color: "red", label: "Für mich ist klar: Die steigenden Prämien sind kein Zufall, sondern die direkte Folge explodierender Kosten. Diese Kosten entstehen durch immer mehr Behandlungen, unabhängig davon, ob sie nötig sind oder nicht. Solange Krankenkassen jede Leistung bezahlen müssen und keine Steuerungsmöglichkeiten haben, wird sich daran nichts ändern.", description: "• Steigende Prämien sind Folge von explodierenden Kosten durch immer mehr Behandlungen.\n• Es braucht Steuerungsmöglichkeiten für Krankenkassen.\n• Ziel: Prämien senken durch Kostenkontrolle." },
-    { color: "green", label: "Aus medizinischer Sicht ist das System widersprüchlich. Wir leisten hervorragende Medizin, aber oft zu viel davon. Es gibt unnötige Untersuchungen und Eingriffe, die weder den Patienten noch dem System nützen. Gleichzeitig fehlen Anreize für Qualität und Zurückhaltung.", description: "• Das System ist widersprüchlich: Hervorragende Medizin, aber oft zu viel davon.\n• Es gibt unnötige Untersuchungen und Eingriffe, die weder Patienten noch dem System nützen." },
-  ];
+  // Undecided: E (blue) = Betroffene Bevölkerung
+  const debateData = (language === "de" ? mockDebateDE : mockDebateEN) as DebateData;
+  const speakerColors: Record<string, Color> = {
+    A: "red",
+    B: "yellow",
+    C: "green",
+    D: "gray",
+    E: "blue",
+  };
 
-  const proBots = allBots.slice(0, 2);
-  const contraBots = allBots.slice(2, 4);
+   const debateScript: DebateScriptItem[]= debateData["Arguments Intro"]
+  ?? debateData.debate_script ?? [];
+
+  const roles = debateData.roles;
+
+  const order: Color[] = ["yellow", "gray", "blue", "red", "green"];
+
+  const allBots: Bot[] = useMemo (()=> {
+    return debateScript.map((msg): Bot => {
+      const color = speakerColors[msg.speaker];
+      return {
+        color,
+        label: msg.text,
+        description: (roles as Record <Speaker, RoleData> | undefined)?.[msg.speaker]?.description ?? "",
+      };
+    }).sort((a, b) => order.indexOf(a.color) - order.indexOf(b.color));
+  }, [debateScript, roles]);
 
   const typewriterEffect = (text: string, botIndex: number, onComplete: () => void) => {
     const words = text.split(" ");
@@ -95,7 +147,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
     
     // Bot-Farbe ermitteln und Speech Synthesis mit spezifischer Stimme starten
     const botColor = allBots[botIndex].color as BotColor;
-    speak(text, { botColor });
+    speak(text, { botColor, lang: language });
     
     // Berechne Wort-Dauer basierend auf Sprechgeschwindigkeit
     const wordDuration = getWordDuration(text, botColor);
@@ -114,7 +166,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
         setSpokenBots(prev => [...prev, botIndex]);
         onComplete();
       }
-    }, 380);
+    }, wordDuration);
   };
 
   // Cleanup interval on unmount
@@ -129,6 +181,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
 
   const handleNext = () => {
     if (!hasStarted) {
+      if (!allBots.length) return;
       onStart();
       setActiveBot(0);
       // Starte Typewriter für ersten Bot
@@ -166,7 +219,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
     return undefined;
   };
 
-  const getBubbleLabel = (seq: number, _label: string): string => {
+  const getBubbleLabel = (seq: number): string => {
     if (completedTexts[seq]) {
       return completedTexts[seq];
     }
@@ -181,6 +234,18 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
         onConfirm={handleExitConfirm} 
         onCancel={handleExitCancel} 
       />
+      {/* Timer abgelaufen Popup */}
+      {showTimeExpired && (
+        <div className="start-debate-modal-overlay">
+          <div className="start-debate-modal">
+            <div className="modal-icon">⏱️</div>
+            <p className="modal-text">{t("timeExpiredContinue")}</p>
+            <button className="start-debate-btn" onClick={() => {setShowTimeExpired(false); handleNext();}}>
+              {t("continue")}
+            </button>
+          </div>
+        </div>
+      )}
       <div className="top-exit-row">
         <span className="timer-display">{introTime}</span>
         <div className="top-buttons-row">
@@ -214,47 +279,21 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
     `
   }}>
         <div className="arguments-stage">
-          {/* Pro Side */}
-          <div className="arguments-side pro-side">
-            <div className="candidates-row">
-              {proBots.map((bot, i) => {
-                const seq = i;
-                return (
-                  <CandidateCard
-                    key={i}
-                    color={bot.color as "yellow" | "gray" | "red" | "green"}
-                    hasMic={hasStarted && activeBot === seq && currentTypingText !== undefined}
-                    showBubble={hasStarted && (activeBot === seq || spokenBots.includes(seq))}
-                    bubbleText={getBotText(seq)}
-                    isTyping={hasStarted && isTyping && activeBot === seq}
-                    bubbleLabel={getBubbleLabel(seq, bot.label)}
-                    isSpeaking={hasStarted && activeBot === seq && (isTyping || currentTypingText !== undefined)}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Contra Side */}
-          <div className="arguments-side contra-side">
-
-            <div className="candidates-row">
-              {contraBots.map((bot, i) => {
-                const seq = proBots.length + i;
-                return (
-                  <CandidateCard
-                    key={i}
-                    color={bot.color as "yellow" | "gray" | "red" | "green"}
-                    hasMic={hasStarted && activeBot === seq && currentTypingText !== undefined}
-                    showBubble={hasStarted && (activeBot === seq || spokenBots.includes(seq))}
-                    bubbleText={getBotText(seq)}
-                    isTyping={hasStarted && isTyping && activeBot === seq}
-                    bubbleLabel={hasStarted ? getBubbleLabel(seq, bot.label) : ""}
-                    isSpeaking={hasStarted && activeBot === seq && (isTyping || currentTypingText !== undefined)}
-                  />
-                );
-              })}
-            </div>
+          <div className="candidates-row-unified">
+            {allBots.map((bot, i) => {
+              return (
+                <CandidateCard
+                  key={i}
+                  color={bot.color as "yellow" | "gray" | "blue" | "red" | "green"}
+                  hasMic={hasStarted && activeBot === i && currentTypingText !== undefined}
+                  showBubble={hasStarted && (activeBot === i || spokenBots.includes(i))}
+                  bubbleText={getBotText(i)}
+                  isTyping={hasStarted && isTyping && activeBot === i}
+                  bubbleLabel={hasStarted ? getBubbleLabel(i) : ""}
+                  isSpeaking={hasStarted && activeBot === i && (isTyping || currentTypingText !== undefined)}
+                />
+              );
+            })}
           </div>
         </div>
       </section>

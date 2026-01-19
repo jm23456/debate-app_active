@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 // Bot-Farben zu Stimm-Eigenschaften zuordnen
-export type BotColor = 'red' | 'yellow' | 'green' | 'gray';
+export type BotColor = 'red' | 'yellow' | 'green' | 'gray' | 'blue';
 
 interface VoiceConfig {
   pitch: number;
@@ -11,14 +11,16 @@ interface VoiceConfig {
 
 // Verschiedene Stimm-Konfigurationen für jeden Bot
 const voiceConfigs: Record<BotColor, VoiceConfig> = {
-  red: { pitch: 1.2, rate: 1.2, voiceType: 'female' },      // Tiefe männliche Stimme
-  yellow: { pitch: 0.8, rate: 1.3, voiceType: 'male' },  // Höhere weibliche Stimme
-  green: { pitch: 1.1, rate: 1.4, voiceType: 'male' },     // Neutrale männliche Stimme
-  gray: { pitch: 1.1, rate: 1.3, voiceType: 'female' },   // Leicht höhere weibliche Stimme
+  red: { pitch: 1.1, rate: 1.05, voiceType: 'female' },      // Höhere weibliche Stimme 
+  yellow: { pitch: 0.7, rate: 1.06, voiceType: 'male' },     // Tiefe männliche Stimme
+  blue: { pitch: 0.75, rate: 1.0, voiceType: 'male'},        // Neutrale männliche Stimme
+  green: { pitch: 0.8, rate: 1.04, voiceType: 'male' },      // Leicht höhere männliche Stimme
+  gray: { pitch: 1.15, rate: 1.01, voiceType: 'female' },     // Höhere weibliche Stimme
 };
 
 interface SpeakOptions {
   botColor?: BotColor;
+  lang?: string;
   onWordSpoken?: (wordIndex: number) => void;
 }
 
@@ -47,6 +49,14 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
     const loadVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices();
       setVoices(availableVoices);
+      // DEBUG: Zeige alle verfügbaren deutschen Stimmen in der Konsole
+      console.log('=== ALLE VERFÜGBAREN STIMMEN ===');
+      availableVoices
+        .filter(v => v.lang.startsWith('de'))
+        .forEach((v, i) => console.log(`DE ${i}: "${v.name}" (${v.lang})`));
+      availableVoices
+        .filter(v => v.lang.startsWith('en'))
+        .forEach((v, i) => console.log(`EN ${i}: "${v.name}" (${v.lang})`));
     };
 
     loadVoices();
@@ -58,40 +68,35 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
   }, []);
 
   // Finde passende Stimme basierend auf Konfiguration
-  const getVoiceForBot = useCallback((botColor: BotColor): SpeechSynthesisVoice | null => {
-    const config = voiceConfigs[botColor];
-    
-    // Deutsche Stimmen filtern
-    const germanVoices = voices.filter(v => v.lang.startsWith('de'));
-    
-    if (germanVoices.length === 0) return null;
-
-    // Versuche passende Stimme zu finden (männlich/weiblich)
-    if (config.voiceType === 'male') {
-      const maleVoice = germanVoices.find(v => 
-        v.name.toLowerCase().includes('male') || 
-        v.name.toLowerCase().includes('mann') ||
-        v.name.toLowerCase().includes('martin') ||
-        v.name.toLowerCase().includes('hans') ||
-        v.name.toLowerCase().includes('daniel')
+  const getVoiceForBot = useCallback(
+    (botColor: BotColor, lang: string): SpeechSynthesisVoice | null => {
+      const isEnglish = lang.startsWith('en');
+      const langVoices = voices.filter(v => 
+        isEnglish ? v.lang.startsWith('en') : v.lang === 'de-DE'
       );
-      if (maleVoice) return maleVoice;
-    } else {
-      const femaleVoice = germanVoices.find(v => 
-        v.name.toLowerCase().includes('female') || 
-        v.name.toLowerCase().includes('frau') ||
-        v.name.toLowerCase().includes('anna') ||
-        v.name.toLowerCase().includes('petra') ||
-        v.name.toLowerCase().includes('helena')
-      );
-      if (femaleVoice) return femaleVoice;
-    }
+      if (langVoices.length === 0) return null;
 
-    // Fallback: Verschiedene Stimmen für verschiedene Bots verwenden
-    const colorIndex = { red: 0, yellow: 1, green: 2, gray: 3 };
-    const index = colorIndex[botColor] % germanVoices.length;
-    return germanVoices[index] || germanVoices[0];
-  }, [voices]);
+      // Spezifische Stimmen für jeden Bot
+      const botVoiceNames: Record<BotColor, { en: string; de: string }> = {
+        yellow: { en: 'aaron', de: 'martin' },
+        green: { en: 'aaron', de: 'martin' },
+        blue: { en: 'google uk english male', de: 'martin' },
+        gray: { en: 'google uk english female', de: 'helena' },
+        red: { en: 'google us english', de: 'google deutsch' },
+      };
+
+      const targetName = isEnglish 
+        ? botVoiceNames[botColor].en 
+        : botVoiceNames[botColor].de;
+
+      // Finde die Stimme mit dem passenden Namen
+      const matchingVoice = langVoices.find(v => 
+        v.name.toLowerCase().includes(targetName.toLowerCase())
+      );
+      
+      return matchingVoice || langVoices[0];
+  
+    }, [voices]);
 
   const toggleMute = useCallback(() => {
     setIsMuted(prev => {
@@ -116,37 +121,45 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
   const getWordDuration = useCallback((_text: string, botColor: BotColor = 'yellow'): number => {
     const config = voiceConfigs[botColor];
     
-    // Basis: ~300ms pro Wort bei Rate 1.0, angepasst an Bot-Rate
-    const baseWordDuration = 300;
-    const adjustedDuration = baseWordDuration / config.rate;
-    
-    // Dauer pro Wort für Typewriter
-    return Math.round(adjustedDuration);
+    // Basis: ~260ms pro Wort bei Rate 1.0, angepasst an Bot-Rate
+    const baseWordDuration = 260;
+    const jitter = Math.random() * 40;
+    return Math.round((baseWordDuration + jitter) / config.rate);
+
   }, []);
 
   const speak = useCallback((text: string, options: SpeakOptions = {}) => {
     if (isMuted || !text.trim()) return;
     
     const botColor = options.botColor || 'yellow';
+    // Für Englisch: Amerikanisches Englisch (en-US) statt britisches
+    const lang = options.lang === 'en' ? 'en-US' : (options.lang || 'de-DE');
     
     // Nur sprechen wenn neuer Text
     if (text === lastSpokenTextRef.current) return;
-    
     window.speechSynthesis.cancel();
     lastSpokenTextRef.current = text;
     
     const config = voiceConfigs[botColor];
-    const utterance = new SpeechSynthesisUtterance(text);
+    const humanizeText = (text: string) =>
+      text
+        .replace(/:/g, '- ')
+        .replace(/\n+/g, '. ')
+        .replace(/([.,!?;:])([A-ZÄÖÜ])/g, ' $1 $2 ');
+    const utterance = new SpeechSynthesisUtterance(humanizeText(text));
+    const vary = (base: number, delta = 0.04) =>
+      base + (Math.random() * delta * 2 - delta);
     
-    utterance.lang = 'de-DE';
-    utterance.rate = config.rate;
-    utterance.pitch = config.pitch;
+    utterance.lang = lang;
+    utterance.rate = vary(config.rate, 0.05);
+    utterance.pitch = vary(config.pitch, 0.04);
     utterance.volume = 1;
 
     // Stimme für diesen Bot auswählen
-    const voice = getVoiceForBot(botColor);
+    const voice = getVoiceForBot(botColor, utterance.lang);
     if (voice) {
       utterance.voice = voice;
+      console.log(`Bot ${botColor}: Stimme "${voice.name}" (pitch: ${utterance.pitch.toFixed(2)})`);
     }
 
     utterance.onstart = () => setIsSpeaking(true);

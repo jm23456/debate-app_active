@@ -3,13 +3,15 @@ import yellowVideo from "./yellow.mp4";
 import redVideo from "./red.mp4";
 import greenVideo from "./green.mp4";
 import greyVideo from "./grey.mp4";
+import blueVideo from "./blue.mp4";
 import yellowStandard from "./yellow_standard.jpg";
 import redStandard from "./red_standard.jpg";
 import greenStandard from "./green_standard.jpg";
 import greyStandard from "./grey_standard.jpg";
+import blueStandard from "./blue_standard.jpg";
 
 interface CandidateCardProps {
-  color: "yellow" | "gray" | "green" | "red";
+  color: "yellow" | "gray" | "green" | "red" | "blue";
   hasMic?: boolean;
   showBubble?: boolean;
   bubbleText?: string;
@@ -56,6 +58,8 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ color, hasMic = false, sh
         return { video: greenVideo, image: greenStandard };
       case "gray": 
         return { video: greyVideo, image: greyStandard };
+      case "blue":
+        return { video: blueVideo, image: blueStandard };
     }
   }
     const {video, image} = getAvatarAsset();
@@ -83,7 +87,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({ color, hasMic = false, sh
       <div className={`candidate-robot ${hasMic ? "has-mic" : ""}`}>
           <video
             ref={videoRef}
-            src={color === "yellow" ? yellowVideo : color === "red" ? redVideo : color === "green" ? greenVideo : greyVideo}
+            src={color === "yellow" ? yellowVideo : color === "red" ? redVideo : color === "green" ? greenVideo : color === "blue" ? blueVideo : greyVideo}
             className={`robot-video ${isVideoPlaying ? "visible" : "hidden"}`}
             loop
             muted

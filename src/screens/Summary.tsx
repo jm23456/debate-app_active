@@ -30,6 +30,11 @@ const Summary: React.FC<SummaryProps> = ({onStartAnother }) => {
               <CandidateCardIntro color="gray" />
             </div>
 
+          {/* Undecided - Blue Bot (Mitte) */}
+          <div className="introcandidates-row-center">
+            <CandidateCardIntro color="blue" />
+          </div>
+
         {/* Contra Side */}
           <div className="introcandidates-row-right">
             <CandidateCardIntro color="red" />

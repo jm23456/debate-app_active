@@ -3,9 +3,10 @@ import yellowStandard from "./yellow_standard.jpg";
 import redStandard from "./red_standard.jpg";
 import greenStandard from "./green_standard.jpg";
 import greyStandard from "./grey_standard.jpg";
+import blueStandard from "./blue_standard.jpg";
 
 interface CandidateCardIntroProps {
-  color: "yellow" | "gray" | "red" | "green";
+  color: "yellow" | "gray" | "red" | "green" | "blue";
 }
 
 const CandidateCardIntro: React.FC<CandidateCardIntroProps> = ({ color }) => {
@@ -19,6 +20,8 @@ const CandidateCardIntro: React.FC<CandidateCardIntroProps> = ({ color }) => {
         return greenStandard;
       case "gray":
         return greyStandard;
+      case "blue":
+        return blueStandard;
     }
   };
 
