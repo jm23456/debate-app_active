@@ -260,6 +260,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
 
       <section className="screen-body" style={{
         borderRadius: "24px",
+        paddingTop: "50px",
     background: `
       radial-gradient(
         circle at center,

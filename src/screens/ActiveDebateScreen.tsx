@@ -391,7 +391,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
           </div>
         </div>
       )}
-      <div className="top-exit-row">
+      <div className="top-exit-row" style={{marginBottom: "0px"}}>
         <span className="timer-display">{timeLeft}</span>
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
@@ -400,6 +400,10 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
           </button>
         </div>
       </div>
+
+      <header className="screen-header" style={{marginBottom: "10px", marginTop: "0px"}}>
+        <p className="subtitle" style={{marginTop: "0px"}}>{t("healthInsurance")}</p>
+      </header>
 
       {/* Chat-History - chronologisch */}
       <section className="debate-arguments">

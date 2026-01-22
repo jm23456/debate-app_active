@@ -341,7 +341,7 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
       </section>
 
       {/* All candidates stage */}
-      <section className={`debate-stage ${allBotsFinished ? 'stage-minimized' : ''}`}>
+      <section className={`debate-stage ${allBotsFinished ? 'stage-minimized' : ''}`} style={{ paddingTop: "50px" }}>
         <div className="arguments-stage">
           {allBots.map((bot, i) => (
             <CandidateCard

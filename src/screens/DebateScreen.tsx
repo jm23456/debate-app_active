@@ -362,7 +362,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
           </div>
         </div>
       )}
-      <div className="top-exit-row">
+      <div className="top-exit-row" style={{marginBottom: "0px"}}>
         <span className="timer-display">{timeLeft}</span>
         <div className="top-buttons-row">
           <MuteButton isMuted={isMuted} onToggle={toggleMute} />
@@ -372,8 +372,8 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
         </div>
       </div>
 
-      <header className="screen-header" style={{marginBottom: "10px"}}>
-        <p className="subtitle">{topicTitle}</p>
+      <header className="screen-header" style={{marginBottom: "10px", marginTop: "0px"}}>
+        <p className="subtitle" style={{marginTop: "0px"}}>{t("healthInsurance")}</p>
       </header>
 
       {/* Chat-History - chronologisch */}

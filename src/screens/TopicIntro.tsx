@@ -11,7 +11,7 @@ interface TopicIntroProps {
 }
 
 const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [showExitWarning, setShowExitWarning] = useState(false);
 
   const handleExitClick = () => {
@@ -26,6 +26,10 @@ const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) =
   const handleExitCancel = () => {
     setShowExitWarning(false);
   };
+
+  const image = language === "de"
+    ? import.meta.env.BASE_URL + "Infografik_Praemien.png"
+    : import.meta.env.BASE_URL + "Infografik.en.png";
 
   return (
     <section className="screen-body">
@@ -50,13 +54,13 @@ const TopicIntro: React.FC<TopicIntroProps> = ({ topicTitle, onNext, onExit }) =
       }}>
         <header className="screen-header" style={{marginBottom: "30px"}}>
           <h4 style={{ fontSize: "28px", textAlign: "center", marginBottom: "5px" }}>{t("topicIntro")}</h4>
-          <p className="subtitle" style={{ marginTop: "10px"}}>{topicTitle}</p>
+          <p className="subtitle" style={{ marginTop: "10px"}}>{t("healthInsurance")}</p>
           <h2 style={{ textAlign: "center", marginTop: "30px" }}>{t("topicIntroH")}</h2>
         </header>
         <section className="screen-body scrollable">
           <div className="topic-intro-content">
             <div className="topic-intro-image">
-              <img src={import.meta.env.BASE_URL + "Infografik_Praemien.png"} alt="Infografik Prämien" />
+              <img src={image} alt="Infografik Prämien" />
             </div>
             <div className="topic-intro-text">
               <p>
