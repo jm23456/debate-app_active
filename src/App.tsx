@@ -105,6 +105,7 @@ const App: React.FC = () => {
           <TopicIntro
             topicTitle={currentTopicTitle}
             onNext={() => {
+              setHasStarted(false);
               if (role === "ACTIVE") {
                 setStep(STEPS.ACTIVE_ARGUMENTS_INTRO);
               } else {

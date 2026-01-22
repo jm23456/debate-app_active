@@ -149,9 +149,6 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
     const botColor = allBots[botIndex].color as BotColor;
     speak(text, { botColor, lang: language });
     
-    // Berechne Wort-Dauer basierend auf Sprechgeschwindigkeit
-    const wordDuration = getWordDuration(text, botColor);
-    
     typingIntervalRef.current = window.setInterval(() => {
       wordCount++;
       if (wordCount <= words.length) {
@@ -166,7 +163,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
         setSpokenBots(prev => [...prev, botIndex]);
         onComplete();
       }
-    }, wordDuration);
+    }, 380);
   };
 
   // Cleanup interval on unmount
@@ -239,7 +236,7 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
         <div className="start-debate-modal-overlay">
           <div className="start-debate-modal">
             <div className="modal-icon">⏱️</div>
-            <p className="modal-text">{t("timeExpiredContinue")}</p>
+            <p style={{fontSize: "16px"}}>{t("timeExpiredContinue")}</p>
             <button className="start-debate-btn" onClick={() => {setShowTimeExpired(false); handleNext();}}>
               {t("continue")}
             </button>
@@ -301,7 +298,8 @@ const ArgumentsIntro: React.FC<ArgumentsIntroProps> = ({
       {!hasStarted && (
         <div className="start-debate-modal-overlay">
           <div className="start-debate-modal">
-            <h3 style={{fontSize: "18px"}}>{t("popup1")}</h3>
+            <p style={{fontSize: "16px"}}>{t("popup1")}</p>
+            <p style={{fontSize: "16px"}}>{t("popup2")}</p>
             <button className="start-debate-btn" onClick={handleNext}>
               {t("startDebate")}
             </button>

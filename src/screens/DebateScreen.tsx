@@ -47,6 +47,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
   const currentBubbleRef = useRef<{text: string, color: Color, side: "pro" | "contra" | "undecided"} | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showTimeExpired, setShowTimeExpired] = useState(false);
+  const [showDebateFinished, setShowDebateFinished] = useState(false);
 
   type SpeakerKey = "A" | "B" | "C" | "D" | "E" | "SYSTEM";
 
@@ -164,6 +165,21 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
   }));
 }, [debateScript]);
 
+  // Check ob alle Argumente gesagt wurden
+  useEffect(() => {
+    if (
+      hasStarted &&
+      visibleBubbles >= argumentBubbles.length &&
+      argumentBubbles.length > 0 &&
+      !isTyping &&
+      currentTypingText === undefined &&
+      !showDebateFinished &&
+      !showTimeExpired
+    ) {
+      setShowDebateFinished(true);
+    }
+  }, [visibleBubbles, argumentBubbles.length, hasStarted, isTyping, currentTypingText, showDebateFinished, showTimeExpired]);
+
   // Initiale Chat-History mit Arguments Intro Nachrichten
   // Reihenfolge: B, D, C, A, E (yellow, gray, blue, red, green)
   const speakerOrder: SpeakerKey[] = ["B", "D", "E", "A", "C"];
@@ -209,8 +225,6 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
     setIsSpeaking(true);
     speak(text, { botColor, lang: language });
     
-    // Berechne Wort-Dauer basierend auf Sprechgeschwindigkeit
-    const wordDuration = getWordDuration(text, botColor);
     
     typingIntervalRef.current = window.setInterval(() => {
       wordCount++;
@@ -238,7 +252,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
         }]);
         setVisibleBubbles(prev => prev + 1);
       }
-    }, wordDuration);
+    }, 380);
   };
 
   // Starte automatisch die erste Nachricht beim Laden
@@ -336,6 +350,18 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
           </div>
         </div>
       )}
+      {/* Debatte beendet Popup */}
+      {showDebateFinished && (
+        <div className="start-debate-modal-overlay">
+          <div className="start-debate-modal">
+            <h2 className="modal-title">{t("debateFinishedTitle")}</h2>
+            <p className="modal-text">{t("debateFinishedText")}</p>
+            <button className="start-debate-btn" onClick={() => {setShowDebateFinished(false); onExit();}}>
+              {t("continue")}
+            </button>
+          </div>
+        </div>
+      )}
       <div className="top-exit-row">
         <span className="timer-display">{timeLeft}</span>
         <div className="top-buttons-row">
@@ -395,7 +421,7 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
       )
     `
   }}>
-        <div className="arguments-stage">
+        <div className="arguments-stage" style={{gap: "100px"}}>
           <CandidateCard 
             color="yellow" 
             hasMic={hasStarted && currentSpeaker === "yellow" && (isTyping || isSpeaking) && visibleBubbles < argumentBubbles.length}

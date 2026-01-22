@@ -5,19 +5,25 @@
   box-sizing: border-box;
 }
 
-[data-theme="light"] {
-  --bg-primary: #F6F7FB;
-  --bg-secondary: #ffffff;
-  --bg-card: #f8f7f7;
+:root {
+  --bg-primary: #FEFEFF;
+  --bg-secondary: #FEFEFF;
+  --bg-card: #FEFEFF;
   --text-primary: #1a1a1a;
   --text-secondary: #6b7280;
   --border-color: #e5e7eb;
   --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
+/* Proportionale Skalierung basierend auf Viewport */
+html {
+  /* Basis-Skalierung: 16px bei 1000px Viewport-Breite */
+  font-size: clamp(12px, 1.6vw, 18px);
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   background: var(--bg-primary);
   box-shadow:
@@ -34,6 +40,7 @@ body {
   justify-content: center;
   padding: 0;
   position: relative;
+  background: #FEFEFF;
 }
 
 
@@ -887,6 +894,8 @@ body {
   transform-origin: center top;
   opacity: 0.85;
   overflow: visible;
+  position: relative;
+  overflow: hidden;
 }
 
 .footer-end-row {
@@ -1138,6 +1147,42 @@ body {
 
 .candidate-red .candidate-speech-bubble::after {
   border-top-color: #fef2f2;
+}
+
+/* Speech-Bubble Ausrichtung für äussere Kandidaten - verhindert Überlauf am Rand */
+/* Nur für DebateScreen und nur beim Sprechen (nicht beim Denken) */
+
+/* Erster Kandidat: Bubble leicht nach rechts verschieben */
+.debate-stage .candidate-card.speaking:first-child .candidate-speech-bubble,
+.active-debate-stage .candidate-card.speaking:first-child .candidate-speech-bubble {
+  left: 70%;
+  transform: translateX(-35%);
+}
+
+.debate-stage .candidate-card.speaking:first-child .candidate-speech-bubble::after,
+.active-debate-stage .candidate-card.speaking:first-child .candidate-speech-bubble::after {
+  left: 35%;
+  transform: translateX(0);
+}
+
+/* Letzter Kandidat: Bubble leicht nach links verschieben */
+.debate-stage .candidate-card.speaking:last-child .candidate-speech-bubble,
+.active-debate-stage .candidate-card.speaking:last-child .candidate-speech-bubble {
+  left: 30%;
+  transform: translateX(-65%);
+}
+
+.debate-stage .candidate-card.speaking:last-child .candidate-speech-bubble::after,
+.active-debate-stage .candidate-card.speaking:last-child .candidate-speech-bubble::after {
+  left: 75%;
+  transform: translateX(0);
+}
+
+/* Mittlerer Kandidat bleibt zentriert */
+.debate-stage .candidate-card.speaking:not(:first-child):not(:last-child) .candidate-speech-bubble,
+.active-debate-stage .candidate-card.speaking:not(:first-child):not(:last-child) .candidate-speech-bubble {
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .candidate-robot {
@@ -1533,12 +1578,14 @@ body {
 
 .start-debate-modal {
   background: #F6F7FB;
-  border-radius: 24px;
-  padding: 24px 36px;
+  border-radius: 1.5rem;
+  padding: 1.125rem 1.5rem;
   text-align: center;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.25);
   animation: slideUp 0.4s ease;
-  max-width: 420px;
+  max-width: 24rem;
+  width: 90vw;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 @keyframes slideUp {
@@ -1595,46 +1642,43 @@ body {
 }
 
 .modal-icon {
-  font-size: 64px;
-  margin-bottom: 20px;
+  font-size: 2.25rem;
+  margin-bottom: 1rem;
 }
 
 .modal-title {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #1a1a1a;
-  margin: 0 0 12px 0;
+  margin: 0 0 0.75rem 0;
 }
 
 .modal-text {
-  font-size: 16px;
+  font-size: 1rem;
   color: #6b7280;
-  margin: 0 0 32px 0;
+  margin: 0 0 2rem 0;
   line-height: 1.5;
 }
 
 .start-debate-btn {
-  background: linear-gradient(135deg, #5b21b6, #7c3aed);
+  background: #785fc2;
   color: white;
   border: none;
-  border-radius: 16px;
-  padding: 14px 24px;
-  font-size: 18px;
+  border-radius: 1rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 1.125rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(91, 33, 182, 0.4);
 }
 
 .start-debate-btn:hover {
-  background: linear-gradient(135deg, #4c1d95, #6d28d9);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(91, 33, 182, 0.5);
+  background: #5e35b1;
+  transform: translateY(-1px);
 }
 
 .start-debate-btn:active {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(91, 33, 182, 0.4);
 }
 
 /* Urgent Prompt Overlay - Your Turn */
@@ -1742,28 +1786,30 @@ body {
 
 .exit-warning-modal {
   background: #F6F7FB;
-  border-radius: 24px;
-  padding: 24px 24px;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.25);
   animation: slideUp 0.4s ease;
-  max-width: 400px;
+  max-width: 25rem;
+  width: 90vw;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .exit-modal-buttons {
   display: flex;
-  gap: 16px;
+  gap: 1rem;
   justify-content: center;
-  margin-top: 24px;
+  margin-top: 1.5rem;
 }
 
 .exit-cancel-btn {
   background: #e5e7eb;
   color: #374151;
   border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-size: 16px;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1774,22 +1820,20 @@ body {
 }
 
 .exit-confirm-btn {
-  background: linear-gradient(135deg, #dc2626, #ef4444);
+  background: #D32F2F;;
   color: white;
   border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
-  font-size: 16px;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
 .exit-confirm-btn:hover {
-  background: linear-gradient(135deg, #b91c1c, #dc2626);
+  background: #b91c1c;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
 }
 
 /* ========== SKIP BUTTON ========== */

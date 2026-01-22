@@ -49,7 +49,10 @@ de: {
     activeInput: "Teile deine Meinung mit:",
     shareOpinion: "Teile deine Gedanken zur Debatte:",
     timeExpiredContinue: "Die Zeit ist abgelaufen. Bitte fahre fort.",
-    timeExpiredFinish: "Die Zeit ist abgelaufen. Bitte beende nun die Debatte."
+    timeExpiredFinish: "Die Zeit ist abgelaufen. Bitte beende nun die Debatte.",
+    debateFinishedTitle: "Ende der Debatte!",
+    debateFinishedText: "Gehen Sie nun weiter zur Zusammenfassung.",
+    goToSummary: "Zur Zusammenfassung"
 },
 en: {
     continue: "Continue",
@@ -101,7 +104,10 @@ en: {
     activeInput: "Tell your opinion:",
     shareOpinion: "Share your thoughts on the debate:",
     timeExpiredContinue: "Time is up. Please continue.",
-    timeExpiredFinish: "Time is up. Please finish the debate now."
+    timeExpiredFinish: "Time is up. Please finish the debate now.",
+    debateFinishedTitle: "End of the Debate!",
+    debateFinishedText: "Go to the summary now to see the key points.",
+    goToSummary: "Go to Summary"
 },
 } as const;
 
