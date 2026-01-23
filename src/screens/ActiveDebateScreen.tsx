@@ -51,6 +51,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const { t, language } = useLanguage();
   const [showTimeExpired, setShowTimeExpired] = useState(false);
+  const [showDebateFinished, setShowDebateFinished] = useState(false);
 
   type Color = "red" | "yellow" | "green" | "gray" | "blue";
 
@@ -126,7 +127,7 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
       
       // Zähle auch für den urgent prompt
       messagesSinceUserInput.current += 1;
-      if (messagesSinceUserInput.current >= 3 && !showUrgentPrompt) {
+      if (messagesSinceUserInput.current >= 4 && !showUrgentPrompt) {
         setShowUrgentPrompt(true);
       }
     }
@@ -169,12 +170,30 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
   const argumentsIntro = debateData["Arguments Intro"] ?? [];
 
     const argumentBubbles = useMemo(() => {
-      return debateScript.map((msg) => ({
+      return debateScript
+        .filter((msg) => msg.speaker !== "E") // Filtere Speaker E (blau) heraus
+        .map((msg) => ({
       color: speakerColors[msg.speaker as keyof typeof speakerColors],
       side: speakerToSide[msg.speaker as keyof typeof speakerToSide],
       text: msg.text,
     }));
   }, [debateScript]);
+
+   // Check ob alle Argumente gesagt wurden
+    useEffect(() => {
+      if (
+        hasStarted &&
+        visibleBubbles >= argumentBubbles.length &&
+        argumentBubbles.length > 0 &&
+        !isTyping &&
+        currentTypingText === undefined &&
+        !showDebateFinished &&
+        !showTimeExpired
+      ) {
+        setShowDebateFinished(true);
+      }
+    }, [visibleBubbles, argumentBubbles.length, hasStarted, isTyping, currentTypingText, showDebateFinished, showTimeExpired]);
+  
 
   // Initiale Chat-History mit Arguments Intro Nachrichten
   // Reihenfolge: B, D, A, C (yellow, gray, red, green) - ohne E (blue)
@@ -253,12 +272,12 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
           text: text,
           side: side,
           isComplete: true
-        }]);
+        }]);showDebateFinished
         setVisibleBubbles(prev => prev + 1);
         
-        // Zähle Bot-Nachrichten und zeige nach 3 die dringende Aufforderung
+        // Zähle Bot-Nachrichten und zeige nach 4 die dringende Aufforderung
         messagesSinceUserInput.current += 1;
-        if (messagesSinceUserInput.current >= 3 && !showUrgentPrompt) {
+        if (messagesSinceUserInput.current >= 4 && !showUrgentPrompt) {
           setShowUrgentPrompt(true);
         }
       }
@@ -382,13 +401,49 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
       {/* Timer abgelaufen Popup */}
       {showTimeExpired && (
         <div className="start-debate-modal-overlay">
-          <div className="start-debate-modal">
+          <div className="start-debate-modal"style={{padding: 0, overflow: "hidden"}}>
+            <div style={{
+              background: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px"
+            }}>
             <div className="modal-icon">⏱️</div>
-            <p className="modal-text">{t("timeExpiredFinish")}</p>
+            <span style={{fontSize: "16px", fontWeight: "600", color: "#dc2626"}}>{t("timeExpired")}</span>
+            </div>
+            <div style={{padding: "0rem 1rem 1.5rem 1rem"}}>
+              <div className="time-bar">
+              <div className="time-bar-fill"></div>
+              </div>
+            <p style={{fontSize: "18px"}}>{t("timeExpiredFinish")}</p>
             <button className="start-debate-btn" onClick={() => {setShowTimeExpired(false); handleTimeExpiredContinue();}}>
               {t("continue")}
             </button>
           </div>
+        </div>
+        </div>
+      )}
+      {/* Debatte beendet Popup */}
+      {showDebateFinished && (
+        <div className="start-debate-modal-overlay">
+          <div className="start-debate-modal" style={{padding: 0, overflow: "hidden"}}>
+             <div style={{
+              background: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+              padding: "1.25rem 1.5rem",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              marginBottom: "0.5rem"
+            }}>
+            <p style={{fontSize: "20px", fontWeight: "600", margin: 0, color: "#5b21b6"}}>{t("debateFinishedTitle")}</p>
+            </div>
+            <div style={{padding: "0rem 0.5rem 1.5rem 0.5rem"}}>
+            <p style={{fontSize: "16px"}}>{t("debateFinishedText")}</p>
+            <button className="start-debate-btn" onClick={() => {setShowDebateFinished(false); onExit();}}>
+              {t("continue")}
+            </button>
+          </div>
+        </div>
         </div>
       )}
       <div className="top-exit-row" style={{marginBottom: "0px"}}>
@@ -494,14 +549,24 @@ const ActiveDebateScreen: React.FC<ActiveDebateScreenProps> = ({
       {/* Modal Overlay für Start Debate nach User-Input */}
       {!hasStarted && (
         <div className="start-debate-modal-overlay">
-          <div className="start-debate-modal">
-            <h2 className="modal-title">{t("ready")}</h2>
-            <p className="modal-text" style={{marginBottom: "0px"}}>{t("readyText2")}</p>
-            <p className="modal-text" style={{marginTop: "0px"}}>{t("readyText3")} </p>
+          <div className="start-debate-modal" style={{padding: 0, overflow: "hidden"}}>
+            <div style={{
+              background: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+              padding: "1.25rem 1.5rem",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              marginBottom: "0.5rem"
+            }}>
+            <p style={{fontSize: "20px", fontWeight: "600", margin: 0, color: "#5b21b6"}}>{t("readyText1")}</p>
+            </div>
+            <div style={{padding: "0rem 0.5rem 1rem 0.5rem"}}>
+            <h2 className="modal-title" style={{fontSize: "22px", marginTop: "5px"}}>{t("ready")}</h2>
+            <p className="modal-text" style={{fontSize: "16px", marginBottom: "2px"}}>{t("readyText2")}</p>
+            <p className="modal-text" style={{fontSize: "16px", marginTop: "0px"}}>{t("readyText3")}</p>
             <button className="start-debate-btn" onClick={handleContinue}>
               {t("startDebate")}
             </button>
           </div>
+        </div>
         </div>
       )}
 

@@ -301,13 +301,29 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
       {/* Timer abgelaufen Popup */}
       {showTimeExpired && (
         <div className="start-debate-modal-overlay">
-          <div className="start-debate-modal">
-            <div className="modal-icon">⏱️</div>
-            <p className="modal-text">{t("timeExpiredContinue")}</p>
+          <div className="start-debate-modal" style={{padding: 0, overflow: "hidden"}}>
+            <div style={{
+              background: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px"
+            }}>
+              <div className="modal-icon">⏱️</div>
+              <span style={{fontSize: "16px", fontWeight: "600", color: "#dc2626"}}>{t("timeExpired")}</span>
+            </div>
+            <div style={{padding: "0rem 1rem 1.5rem 1rem"}}>
+              <div className="time-bar">
+              <div className="time-bar-fill"></div>
+              </div>
+            <p style={{fontSize: "16px", marginBottom: "2px"}}>{t("timeExpiredContinue")}</p>
+            <p style={{fontSize: "16px", marginTop: "0px"}}>{t("timeExpiredContinue2")}</p>
             <button className="start-debate-btn" onClick={() => {setShowTimeExpired(false); handleNextSpeaker();}}>
               {t("continue")}
             </button>
           </div>
+        </div>
         </div>
       )}
       <div className="top-exit-row">
@@ -360,12 +376,22 @@ const ActiveArgumentsIntro: React.FC<ActiveArgumentsScreenProps> = ({
 
       {!hasStarted && (
         <div className="start-debate-modal-overlay">
-          <div className="start-debate-modal">
-            <p style={{fontSize: "19px"}}>{t("popup1")}</p>
-            <p style={{fontSize: "19px"}}>{t("popup2")}</p>
-            <button className="start-debate-btn" onClick={handleNextSpeaker}>
-              {t("continue")}
-            </button>
+          <div className="start-debate-modal" style={{padding: 0, overflow: "hidden"}}>
+            <div style={{
+              background: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+              padding: "1.25rem 1.5rem",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              marginBottom: "0.5rem"
+            }}>
+              <p style={{fontSize: "20px", fontWeight: "600", margin: 0, color: "#5b21b6"}}>{t("popup1")}</p>
+            </div>
+            <div style={{padding: "0rem 0.5rem 1.5rem 0.5rem"}}>
+              <p style={{fontSize: "18px", marginTop: "10px"}}>{t("popup2")}</p>
+              <p style={{fontSize: "18px"}}>{t("popup3")}</p>
+              <button className="start-debate-btn" onClick={handleNextSpeaker}>
+                {t("startDebate")}
+              </button>
+            </div>
           </div>
         </div>
       )}

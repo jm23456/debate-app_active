@@ -330,7 +330,9 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
     onSend();
   };
 
+
   return (
+    
     <div className="screen debate-screen">
       <LanguageToggle />
       <ExitWarningModal 
@@ -341,25 +343,50 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
       {/* Timer abgelaufen Popup */}
       {showTimeExpired && (
         <div className="start-debate-modal-overlay">
-          <div className="start-debate-modal">
+          <div className="start-debate-modal"style={{padding: 0, overflow: "hidden"}}>
+            <div style={{
+              background: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px"
+            }}>
             <div className="modal-icon">⏱️</div>
-            <p className="modal-text">{t("timeExpiredFinish")}</p>
+            <span style={{fontSize: "16px", fontWeight: "600", color: "#dc2626"}}>{t("timeExpired")}</span>
+            </div>
+            <div style={{padding: "0rem 1rem 1.5rem 1rem"}}>
+              <div className="time-bar">
+              <div className="time-bar-fill"></div>
+              </div>
+            <p style={{fontSize: "18px"}}>{t("timeExpiredFinish")}</p>
             <button className="start-debate-btn" onClick={() => {setShowTimeExpired(false); handleTimeExpiredContinue();}}>
               {t("continue")}
             </button>
           </div>
         </div>
+        </div>
       )}
+    
       {/* Debatte beendet Popup */}
       {showDebateFinished && (
         <div className="start-debate-modal-overlay">
-          <div className="start-debate-modal">
-            <h2 className="modal-title">{t("debateFinishedTitle")}</h2>
-            <p className="modal-text">{t("debateFinishedText")}</p>
+          <div className="start-debate-modal" style={{padding: 0, overflow: "hidden"}}>
+             <div style={{
+              background: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+              padding: "1.25rem 1.5rem",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              marginBottom: "0.5rem"
+            }}>
+            <p style={{fontSize: "20px", fontWeight: "600", margin: 0, color: "#5b21b6"}}>{t("debateFinishedTitle")}</p>
+            </div>
+            <div style={{padding: "0rem 0.5rem 1.5rem 0.5rem"}}>
+            <p style={{fontSize: "16px"}}>{t("debateFinishedText")}</p>
             <button className="start-debate-btn" onClick={() => {setShowDebateFinished(false); onExit();}}>
               {t("continue")}
             </button>
           </div>
+        </div>
         </div>
       )}
       <div className="top-exit-row" style={{marginBottom: "0px"}}>
@@ -473,17 +500,28 @@ const DebateScreen: React.FC<DebateScreenProps> = ({
         </div>
       </section>
 
+
       {/* Modal Overlay für Start Debate */}
       {!hasStarted && (
         <div className="start-debate-modal-overlay">
-          <div className="start-debate-modal">
-            <div className="modal-icon">🎙️</div>
-            <h2 className="modal-title">{t("ready")}</h2>
-            <p className="modal-text">{t("readyText")}</p>
+          <div className="start-debate-modal" style={{padding: 0, overflow: "hidden"}}>
+            <div style={{
+              background: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+              padding: "1.25rem 1.5rem",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              marginBottom: "0.5rem"
+            }}>
+            <p style={{fontSize: "20px", fontWeight: "600", margin: 0, color: "#5b21b6"}}>{t("readyText1")}</p>
+            </div>
+            <div style={{padding: "0rem 0.5rem 1rem 0.5rem"}}>
+            <h2 className="modal-title" style={{fontSize: "22px", marginTop: "5px"}}>{t("ready")}</h2>
+            <p className="modal-text" style={{fontSize: "16px", marginBottom: "2px"}}>{t("readyText")}</p>
+            <p className="modal-text" style={{fontSize: "16px", marginTop: "0px"}}>{t("readyText4")}</p>
             <button className="start-debate-btn" onClick={onStart}>
               {t("startDebate")}
             </button>
           </div>
+        </div>
         </div>
       )}
 

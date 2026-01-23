@@ -12,18 +12,27 @@ const ExitWarningModal: React.FC<ExitWarningModalProps> = ({ isOpen, onConfirm, 
   const { t } = useLanguage();
   if (!isOpen) return null;
 
-
   return (
     <div className="exit-warning-modal-overlay">
-      <div className="exit-warning-modal">
-        <h3>{t("exitSure")}</h3>
-        <div className="exit-modal-buttons">
-          <button className="exit-cancel-btn" onClick={onCancel}>
-            {t("cancel")}
-          </button>
-          <button className="exit-confirm-btn" onClick={onConfirm}>
-            {t("leave")}
-          </button>
+      <div className="exit-warning-modal" style={{padding: 0, overflow: "hidden"}}>
+        <div style={{
+              background: "linear-gradient(135deg, #f9d1d1 0%, #fba9a9 100%)",
+              padding: "1rem 1rem",
+              borderRadius: "1.5rem 1.5rem 0 0",
+              marginBottom: "0.5rem"
+            }}>
+        <p style={{fontSize: "20px", fontWeight: "600", margin: 0, color: "#cb1919"}}>{t("exit2")}</p>
+        </div>
+        <div style={{padding: "0rem 1.5rem 1rem 0.5rem"}}>
+          <p style={{fontSize: "17px"}}>{t("exitSure")}</p>
+          <div className="exit-modal-buttons">
+            <button className="exit-cancel-btn" onClick={onCancel}>
+              {t("cancel")}
+            </button>
+            <button className="exit-confirm-btn" onClick={onConfirm}>
+              {t("leave")}
+            </button>
+          </div>
         </div>
       </div>
     </div>
