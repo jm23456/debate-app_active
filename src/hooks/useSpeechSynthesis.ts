@@ -68,7 +68,8 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
   }, []);
 
   // Finde passende Stimme basierend auf Konfiguration
-  const getVoiceForBot = useCallback(
+
+ const getVoiceForBot = useCallback(
     (botColor: BotColor, lang: string): SpeechSynthesisVoice | null => {
       const isEnglish = lang.startsWith('en');
       const langVoices = voices.filter(v => 
@@ -110,6 +111,8 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
       return newValue;
     });
   }, []);
+
+
 
   const stopSpeaking = useCallback(() => {
     window.speechSynthesis.cancel();
