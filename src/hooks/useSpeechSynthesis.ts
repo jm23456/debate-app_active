@@ -10,13 +10,12 @@ interface VoiceConfig {
 }
 
 // Verschiedene Stimm-Konfigurationen für jeden Bot
-// Stärkere Pitch-Unterschiede für bessere Unterscheidbarkeit auf allen Geräten
 const voiceConfigs: Record<BotColor, VoiceConfig> = {
-  red: { pitch: 1.2, rate: 1.05, voiceType: 'female' },      // Hohe weibliche Stimme 
-  yellow: { pitch: 0.8, rate: 0.97, voiceType: 'male' },     // Sehr tiefe männliche Stimme
-  blue: { pitch: 0.91, rate: 1.0, voiceType: 'male'},        // Mittlere männliche Stimme
-  green: { pitch: 1.0, rate: 1.08, voiceType: 'male' },      // Leicht höhere, schnellere Stimme
-  gray: { pitch: 1.25, rate: 0.95, voiceType: 'female' },    // Hohe, langsamere weibliche Stimme
+  red: { pitch: 1.1, rate: 1.07, voiceType: 'female' },      // Höhere weibliche Stimme 
+  yellow: { pitch: 0.7, rate: 1.06, voiceType: 'male' },     // Tiefe männliche Stimme
+  blue: { pitch: 0.75, rate: 1.02, voiceType: 'male'},        // Neutrale männliche Stimme
+  green: { pitch: 0.8, rate: 1.04, voiceType: 'male' },      // Leicht höhere männliche Stimme
+  gray: { pitch: 1.15, rate: 1.03, voiceType: 'female' },     // Höhere weibliche Stimme
 };
 
 interface SpeakOptions {
@@ -78,26 +77,25 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
       );
       if (langVoices.length === 0) return null;
 
-      const config = voiceConfigs[botColor];
-      const wantsFemale = config.voiceType === 'female';
+      // Spezifische Stimmen für jeden Bot
+      const botVoiceNames: Record<BotColor, { en: string; de: string }> = {
+        yellow: { en: 'aaron', de: 'martin' },
+        green: { en: 'aaron', de: 'martin' },
+        blue: { en: 'google uk english male', de: 'martin' },
+        gray: { en: 'google uk english female', de: 'helena' },
+        red: { en: 'google us english', de: 'google deutsch' },
+      };
 
-      // Bekannte weibliche Stimmnamen (plattformübergreifend)
-      const femaleNames = ['samantha', 'karen', 'moira', 'fiona', 'victoria', 'zira', 'hazel', 'susan', 'helena', 'anna', 'petra', 'female', 'woman'];
-      // Bekannte männliche Stimmnamen
-      const maleNames = ['daniel', 'alex', 'tom', 'aaron', 'david', 'james', 'george', 'martin', 'stefan', 'male', 'man'];
+      const targetName = isEnglish 
+        ? botVoiceNames[botColor].en 
+        : botVoiceNames[botColor].de;
 
-      // Versuche eine Stimme des gewünschten Geschlechts zu finden
-      const targetNames = wantsFemale ? femaleNames : maleNames;
+      // Finde die Stimme mit dem passenden Namen
+      const matchingVoice = langVoices.find(v => 
+        v.name.toLowerCase().includes(targetName.toLowerCase())
+      );
       
-      for (const name of targetNames) {
-        const match = langVoices.find(v => 
-          v.name.toLowerCase().includes(name)
-        );
-        if (match) return match;
-      }
-
-      // Fallback: Erste verfügbare Stimme
-      return langVoices[0];
+      return matchingVoice || langVoices[0];
   
     }, [voices]);
 
