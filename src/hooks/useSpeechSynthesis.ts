@@ -5,18 +5,19 @@ export type BotColor = 'red' | 'yellow' | 'green' | 'gray' | 'blue';
 
 interface VoiceConfig {
   pitch: number;
-  rate: number;
+  rateEn: number;
+  rateDe: number;
   voiceType: 'male' | 'female';
 }
 
 // Verschiedene Stimm-Konfigurationen für jeden Bot
-// Stärkere Rate-Unterschiede für bessere Unterscheidbarkeit auf iOS
+// Unterschiedliche Rates für Englisch (stärkere Unterschiede für iOS) und Deutsch
 const voiceConfigs: Record<BotColor, VoiceConfig> = {
-  red: { pitch: 1.2, rate: 1.15, voiceType: 'female' },      // Etwas schnelle Stimme 
-  yellow: { pitch: 0.8, rate: 0.75, voiceType: 'male' },     // Sehr langsame Stimme
-  blue: { pitch: 0.91, rate: 1.0, voiceType: 'male'},        // Normale Stimme
-  green: { pitch: 1.1, rate: 1.25, voiceType: 'male' },      // Schnelle Stimme
-  gray: { pitch: 1.25, rate: 0.85, voiceType: 'female' },    // Langsame Stimme
+  red: { pitch: 1.2, rateEn: 1.15, rateDe: 1.12, voiceType: 'female' },
+  yellow: { pitch: 0.8, rateEn: 0.75, rateDe: 0.85, voiceType: 'male' },
+  blue: { pitch: 0.91, rateEn: 1.0, rateDe: 0.9, voiceType: 'male'},
+  green: { pitch: 1.1, rateEn: 1.25, rateDe: 1.01, voiceType: 'male' },
+  gray: { pitch: 1.25, rateEn: 0.85, rateDe: 0.99, voiceType: 'female' },
 };
 
 interface SpeakOptions {
@@ -128,7 +129,7 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
     // Basis: ~260ms pro Wort bei Rate 1.0, angepasst an Bot-Rate
     const baseWordDuration = 260;
     const jitter = Math.random() * 40;
-    return Math.round((baseWordDuration + jitter) / config.rate);
+    return Math.round((baseWordDuration + jitter) / config.rateDe);
 
   }, []);
 
@@ -155,7 +156,9 @@ export const useSpeechSynthesis = (): UseSpeechSynthesisReturn => {
       base + (Math.random() * delta * 2 - delta);
     
     utterance.lang = lang;
-    utterance.rate = vary(config.rate, 0.05);
+    const isEnglish = lang.startsWith('en');
+    const baseRate = isEnglish ? config.rateEn : config.rateDe;
+    utterance.rate = vary(baseRate, 0.05);
     utterance.pitch = vary(config.pitch, 0.04);
     utterance.volume = 1;
 
