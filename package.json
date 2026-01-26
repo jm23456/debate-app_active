@@ -1,8 +1,8 @@
 {
-  "name": "debate-app",
+  "name": "debate-app_active",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://jm23456.github.io/debate-app",
+  "homepage": "https://jm23456.github.io/debate-app_active",
   "type": "module",
   "scripts": {
     "dev": "vite",
