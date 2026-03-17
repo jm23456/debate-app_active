@@ -10,7 +10,7 @@ const ROOT = process.cwd();
 const DEBATE_DIR = path.join(ROOT, "debate_text");
 const OUTPUT_DIR = path.join(ROOT, "public/audio");
 
-// Weibliche Sprecher (für lautere Stimme)
+// Weibliche Sprecherinnen (für lautere Stimme)
 const FEMALE_SPEAKERS = ["A", "C"];
 
 // Basis-Geschwindigkeit (1.2x schneller)
@@ -56,7 +56,7 @@ async function processFile(filename) {
 
       console.log("🎙️ generating:", outPath);
 
-      // Für weibliche Stimmen: Instruktion für lautere, energischere Stimme
+      // Makes Female voices louder
       const isFemale = FEMALE_SPEAKERS.includes(speaker);
       const instructions = isFemale 
         ? "Speak with a confident, clear, and slightly louder voice. Project your voice as if speaking to a larger audience."

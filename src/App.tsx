@@ -5,7 +5,6 @@ import type { Step, Role, DebateMessage } from "./types/types";
 
 import RoleSelection from "./screens/RoleSelection";
 import TopicIntro from "./screens/TopicIntro"
-{/*import CandidatesIntro from "./screens/CandidatesIntro";*/}
 import ArgumentsIntro from "./screens/ArgumentsIntro";
 import ActiveDebateScreen from "./screens/ActiveDebateScreen";
 import ActiveArgumentsIntro from "./screens/ActiveArgumentsIntro";
@@ -122,33 +121,6 @@ const App: React.FC = () => {
           />
         )}
 
-        {/*{step === STEPS.CANDIDATES_INTRO && (
-          <CandidatesIntro
-            onNext={() => setStep(STEPS.ARGUMENTS_INTRO)}
-            onExit={() => {
-              setStep(STEPS.SUMMARY);
-              setCustomTopic("");
-              setSelectedTopic("");
-            }}
-            activeBot={activeBot}
-            setActiveBot={setActiveBot}
-            totalBots={4}
-            onContinue={resetIntroTimer}
-            onFinalContinue={() => {
-              if (role === "ACTIVE") {
-                setStep(STEPS.ACTIVE_ARGUMENTS_INTRO);
-              } else {
-                setStep(STEPS.ARGUMENTS_INTRO);
-              }
-              setHasStarted(false);
-            }}
-            hasStarted={hasStarted}
-            onStart={() => {
-              setHasStarted(true);
-              setIntroTime(1 * 60);
-              setActiveBot(0);}}
-          />
-        )}*/}
         {step === STEPS.ARGUMENTS_INTRO && (
           <ArgumentsIntro
             topicTitle={currentTopicTitle}
